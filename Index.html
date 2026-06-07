@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#16161c" id="meta-theme-color">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Flow Forge</title>
+    
+    <link id="manifest-link" rel="manifest" href="">
+
+    <style>
+        :root {
+            /* Default Cyberpunk/Dark Variables */
+            --bg-color: #0b0b0e;
+            --panel-bg: #16161c;
+            --text-color: #f0f0f5;
+            --border-color: #2a2a35;
+            --accent-color: #4a90e2;
+            --font-family: 'Segoe UI', system-ui, sans-serif;
+            --header-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            --canvas-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 0 1px #222;
+            --canvas-bg: #0b0b0e;
+            --grid-line-color: #1b1b22;
+        }
+
+        /* --- THEMES --- */
+        body.theme-cyberpunk {
+            --bg-color: #050508; --panel-bg: #0a0a12; --text-color: #0ff;
+            --border-color: #0ff; --accent-color: #f0f;
+            --font-family: 'Impact', 'Arial Black', sans-serif;
+            --header-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+            --canvas-shadow: 0 0 30px rgba(255, 0, 255, 0.2), inset 0 0 15px #0ff;
+            --canvas-bg: #020205; --grid-line-color: #0a1520;
+        }
+
+        body.theme-vaporwave {
+            --bg-color: #ffb6c1; --panel-bg: rgba(255, 255, 255, 0.85); --text-color: #000;
+            --border-color: #00ffff; --accent-color: #ff00ff;
+            --font-family: 'Arial', sans-serif;
+            --header-shadow: 0 4px 15px rgba(255, 0, 255, 0.3);
+            --canvas-shadow: 0 10px 30px rgba(0, 255, 255, 0.4), inset 0 0 0 2px #ff00ff;
+            --canvas-bg: linear-gradient(180deg, #ff99cc 0%, #99ccff 100%);
+            --grid-line-color: rgba(255, 255, 255, 0.5);
+            text-transform: lowercase; font-style: italic; letter-spacing: 2px;
+        }
+
+        body.theme-retro {
+            --bg-color: #000; --panel-bg: #222; --text-color: #3f3;
+            --border-color: #3f3; --accent-color: #fff;
+            --font-family: 'Courier New', monospace;
+            --header-shadow: none; border-bottom: 4px solid var(--border-color);
+            --canvas-shadow: none; border: 4px solid var(--border-color);
+            --canvas-bg: #000; --grid-line-color: #111;
+            font-weight: bold;
+        }
+
+        body.theme-medieval {
+            --bg-color: #d4c4a8; --panel-bg: #e6d8be; --text-color: #3e2723;
+            --border-color: #8d6e63; --accent-color: #b71c1c;
+            --font-family: 'Georgia', serif;
+            --header-shadow: 0 4px 10px rgba(62, 39, 35, 0.2);
+            --canvas-shadow: 0 5px 25px rgba(62, 39, 35, 0.4), inset 0 0 50px rgba(141, 110, 99, 0.2);
+            --canvas-bg: #f5ebd9; --grid-line-color: #d7ccc8;
+        }
+
+        body.theme-3d {
+            --bg-color: #2c3e50; --panel-bg: #34495e; --text-color: #ecf0f1;
+            --border-color: #7f8c8d; --accent-color: #e74c3c;
+            --font-family: system-ui, sans-serif;
+            --canvas-shadow: 10px 15px 25px rgba(0,0,0,0.5), inset 2px 2px 5px rgba(255,255,255,0.1);
+            --canvas-bg: #22313f; --grid-line-color: #1a252f;
+        }
+
+        /* CRT Overlay for Vaporwave & Retro */
+        .crt-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 9999; display: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 6px 100%;
+        }
+        body.theme-retro .crt-overlay, body.theme-vaporwave .crt-overlay { display: block; }
+        
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+
+        body {
+            margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color);
+            font-family: var(--font-family); display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; overflow: hidden; padding-bottom: env(safe-area-inset-bottom);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        header {
+            width: 100%; padding: max(16px, env(safe-area-inset-top)) 20px 16px 20px;
+            background-color: var(--panel-bg); display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color); box-shadow: var(--header-shadow); z-index: 10;
+        }
+
+        h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+        
+        .stats-bar {
+            display: flex; gap: 15px; font-size: 13px; font-weight: bold; opacity: 0.8;
+        }
+
+        .header-controls { display: flex; gap: 10px; align-items: center; }
+
+        .install-btn {
+            background: var(--accent-color); color: var(--panel-bg); border: none; padding: 6px 12px; border-radius: 16px;
+            font-size: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; display: none;
+        }
+        .install-btn.visible { display: block; }
+
+        .icon-btn {
+            background: none; border: none; color: var(--text-color); cursor: pointer;
+            padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+
+        .container {
+            display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px;
+            padding: 20px; flex-grow: 1; gap: 15px;
+        }
+
+        .metrics {
+            width: 100%; display: flex; justify-content: space-around; background: var(--panel-bg);
+            padding: 10px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--header-shadow);
+        }
+        .metric-item { display: flex; flex-direction: column; align-items: center; }
+        .metric-label { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+        .metric-value { font-size: 20px; font-weight: bold; margin-top: 2px; color: var(--accent-color); }
+
+        .canvas-container {
+            position: relative; width: 100%; aspect-ratio: 1 / 1; max-width: 500px;
+            background: var(--canvas-bg); border-radius: 12px; box-shadow: var(--canvas-shadow); touch-action: none;
+        }
+        canvas { display: block; width: 100%; height: 100%; border-radius: 12px; }
+
+        .action-buttons { display: flex; gap: 10px; width: 100%; max-width: 500px; }
+        button.action {
+            flex: 1; padding: 12px; font-weight: bold; font-size: 14px; border: 1px solid var(--border-color);
+            border-radius: 8px; cursor: pointer; background: var(--panel-bg); color: var(--text-color);
+            text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        button.action.primary { background: var(--accent-color); color: #fff; border: none; flex: 1.2; }
+        button.action:active { transform: translateY(2px); }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 100;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: var(--panel-bg); width: 90%; max-width: 360px; padding: 24px; border-radius: 16px;
+            border: 1px solid var(--border-color); transform: scale(0.95); transition: transform 0.25s ease;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-header { font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+
+        .control-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .control-group label { font-size: 13px; font-weight: bold; }
+        select {
+            background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);
+            padding: 8px 12px; border-radius: 6px; font-size: 13px; font-family: var(--font-family); min-width: 130px;
+        }
+        .btn-full {
+            width: 100%; margin-top: 15px; padding: 12px; background: var(--accent-color); color: #fff;
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase;
+        }
+
+        .win-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--panel-bg);
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 10; border-radius: 12px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            padding: 20px;
+        }
+        .win-overlay.active { opacity: 0.95; pointer-events: auto; }
+        .win-overlay h2 { font-size: 28px; margin-bottom: 10px; color: var(--accent-color); }
+        .win-score { font-size: 18px; margin-bottom: 20px; }
+        .high-score-stamp { color: #f1c40f; font-weight: bold; margin-bottom: 20px; font-size: 14px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .disabled { opacity: 0.4; pointer-events: none; }
+    </style>
+</head>
+<body class="theme-3d">
+    <div class="crt-overlay"></div>
+
+    <header>
+        <h1>Flow Forge</h1>
+        <div class="stats-bar">
+            <div>⏱ <span id="timer-display">0:00</span></div>
+            <div>🔄 <span id="moves-display">0</span></div>
+        </div>
+        <div class="header-controls">
+            <button class="install-btn" id="btn-install">Install</button>
+            <button class="icon-btn" id="btn-settings" title="Settings">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="metrics">
+            <div class="metric-item">
+                <span class="metric-label">Connected</span>
+                <span class="metric-value" id="metric-pipes">0 / 0</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Grid Filled</span>
+                <span class="metric-value" id="metric-coverage">0%</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">High Score</span>
+                <span class="metric-value" id="metric-highscore">0</span>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="gameCanvas"></canvas>
+            <div class="win-overlay" id="win-overlay">
+                <h2>System Cleared</h2>
+                <div class="win-score" id="win-score-display">Score: 0</div>
+                <div class="high-score-stamp" id="new-highscore-stamp" style="display:none;">★ NEW HIGH SCORE ★</div>
+                <button class="action primary" id="btn-next" style="width: 200px;">Next Level</button>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="action disabled" id="btn-undo" title="Undo">↶</button>
+            <button class="action" id="btn-hint">Hint</button>
+            <button class="action" id="btn-reset">Reset</button>
+            <button class="action primary" id="btn-new">New Game</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">Game Configuration</div>
+            <div class="control-group">
+                <label>Theme</label>
+                <select id="theme-select">
+                    <option value="theme-3d">3D Filament</option>
+                    <option value="theme-cyberpunk">Cyberpunk Neon</option>
+                    <option value="theme-vaporwave">Vaporwave</option>
+                    <option value="theme-retro">8-Bit Retro</option>
+                    <option value="theme-medieval">Medieval Parchment</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Color Palette</label>
+                <select id="palette-select"></select>
+            </div>
+            <div class="control-group">
+                <label>Grid Size</label>
+                <select id="grid-size">
+                    <option value="5">5 x 5</option><option value="6">6 x 6</option>
+                    <option value="7">7 x 7</option><option value="8" selected>8 x 8</option>
+                    <option value="9">9 x 9</option><option value="10">10 x 10</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Difficulty</label>
+                <select id="difficulty">
+                    <option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Line Breaking</label>
+                <select id="allow-break"><option value="true">Allowed</option><option value="false" selected>Prevent</option></select>
+            </div>
+            <button class="btn-full" id="btn-close-settings">Apply</button>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================
+           THEMES & PALETTES
+           ========================================= */
+        const Themes = {
+            'theme-3d': {
+                name: '3D Filament',
+                palettes: {
+                    'Standard ABS': ['#FF3B30', '#34C759', '#007AFF', '#FF9500', '#AF52DE', '#FF2D55', '#FFCC00', '#30B0C7', '#8E8E93', '#A2845E'],
+                    'Silk PLA': ['#FF9AA2', '#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#F1CBFF', '#A0E4CB', '#C4D7E0', '#FFF1CC']
+                }
+            },
+            'theme-cyberpunk': {
+                name: 'Cyberpunk Neon',
+                palettes: {
+                    'Night City': ['#00ff00', '#ff00ff', '#00ffff', '#ffff00', '#ff3300', '#3333ff', '#ff0033', '#00ffcc', '#cc00ff', '#ffffff'],
+                    'Netrunner': ['#ff2a2a', '#2a2aff', '#ffff2a', '#ff8800', '#00ff88', '#8800ff', '#ff0088', '#0088ff', '#88ff00', '#ff2a88']
+                }
+            },
+            'theme-vaporwave': {
+                name: 'Vaporwave',
+                palettes: {
+                    'Miami Sunset': ['#ff71ce', '#01cdfe', '#05ffa1', '#b967ff', '#fffb96', '#ff9472', '#41f2ff', '#e07a5f', '#f4a261', '#e9c46a'],
+                    'A E S T H E T I C': ['#ffb3ba', '#ffdfba', '#ffffba', '#baffc9', '#bae1ff', '#e8baff', '#ffbaff', '#baffeb', '#e1ffba', '#ffbacb']
+                }
+            },
+            'theme-retro': {
+                name: '8-Bit Retro',
+                palettes: {
+                    'Classic Arcade': ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', '#ff8800', '#88ff00', '#0088ff'],
+                    'GameBoy DMG': ['#0f380f', '#306230', '#8bac0f', '#9bbc0f', '#0f380f', '#306230', '#8bac0f', '#9bbc0f', '#0f380f', '#306230'] // Faux palette mapped to GB greens
+                }
+            },
+            'theme-medieval': {
+                name: 'Medieval Parchment',
+                palettes: {
+                    'Royal Ink': ['#5D4037', '#B71C1C', '#0D47A1', '#1B5E20', '#E65100', '#4A148C', '#004D40', '#3E2723', '#827717', '#b93232'],
+                    'Alchemist': ['#3e2723', '#4e342e', '#5d4037', '#6d4c41', '#795548', '#8d6e63', '#a1887f', '#bcaaa4', '#d7ccc8', '#efebe9']
+                }
+            }
+        };
+
+        let currentTheme = 'theme-3d';
+        let currentPalette = Themes[currentTheme].palettes[Object.keys(Themes[currentTheme].palettes)[0]];
+
+        function populatePalettes() {
+            const select = document.getElementById('palette-select');
+            select.innerHTML = '';
+            for (let pName in Themes[currentTheme].palettes) {
+                let opt = document.createElement('option');
+                opt.value = pName; opt.textContent = pName;
+                select.appendChild(opt);
+            }
+            currentPalette = Themes[currentTheme].palettes[select.value];
+        }
+
+        document.getElementById('theme-select').addEventListener('change', (e) => {
+            document.body.classList.remove(currentTheme);
+            currentTheme = e.target.value;
+            document.body.classList.add(currentTheme);
+            populatePalettes();
+            drawBoard();
+        });
+
+        document.getElementById('palette-select').addEventListener('change', (e) => {
+            currentPalette = Themes[currentTheme].palettes[e.target.value];
+            // Re-assign colors to solution
+            if (level) {
+                level.solution.forEach((s, i) => s.color = currentPalette[i % currentPalette.length]);
+                resetPaths(false); // Restart level visually with new colors
+            }
+            drawBoard();
+        });
+
+        populatePalettes(); // Init
+
+        /* =========================================
+           PWA INJECTION (Circular Android Icon)
+           ========================================= */
+        const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="240" fill="#16161c" stroke="#2a2a35" stroke-width="16"/><path d="M170 170 a 40 40 0 1 0 1 0 M170 342 a 40 40 0 1 0 1 0 M342 170 a 40 40 0 1 0 1 0 M342 342 a 40 40 0 1 0 1 0" stroke="#4a90e2" stroke-width="32" fill="none" stroke-linecap="round"/><path d="M170 170 L 170 342 M342 170 L 342 342" stroke="#4a90e2" stroke-width="32" fill="none" stroke-linecap="round"/><circle cx="170" cy="170" r="15" fill="#fff"/><circle cx="170" cy="342" r="15" fill="#fff"/><circle cx="342" cy="170" r="15" fill="#fff"/><circle cx="342" cy="342" r="15" fill="#fff"/></svg>`;
+        const iconDataURI = `data:image/svg+xml;base64,${btoa(svgIcon)}`;
+
+        const manifestConfig = {
+            name: "Flow Forge", short_name: "FlowForge", display: "standalone",
+            background_color: "#0b0b0e", theme_color: "#16161c",
+            icons: [{ src: iconDataURI, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }]
+        };
+        document.getElementById('manifest-link').href = `data:application/manifest+json;charset=utf-8,${encodeURIComponent(JSON.stringify(manifestConfig))}`;
+
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'flow-forge-v2';
+                self.addEventListener('install', e => { self.skipWaiting(); });
+                self.addEventListener('activate', e => { self.clients.claim(); });
+                self.addEventListener('fetch', e => { e.respondWith(caches.match(e.request).then(res => res || fetch(e.request))); });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(console.error);
+        }
+
+        let deferredPrompt;
+        const installBtn = document.getElementById('btn-install');
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.classList.add('visible'); });
+        installBtn.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; installBtn.classList.remove('visible'); deferredPrompt = null; } });
+
+        /* =========================================
+           SCORING & TIMER ENGINE
+           ========================================= */
+        let startTime = 0; let timerInterval = null; let movesCount = 0;
+        
+        function formatTime(ms) {
+            let s = Math.floor(ms / 1000); let m = Math.floor(s / 60); s = s % 60;
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval); startTime = Date.now(); movesCount = 0;
+            document.getElementById('moves-display').textContent = movesCount;
+            timerInterval = setInterval(() => {
+                document.getElementById('timer-display').textContent = formatTime(Date.now() - startTime);
+            }, 1000);
+        }
+
+        function incrementMove() {
+            movesCount++;
+            document.getElementById('moves-display').textContent = movesCount;
+        }
+
+        function getHighScoreKey() {
+            const s = document.getElementById('grid-size').value;
+            const d = document.getElementById('difficulty').value;
+            return `flowforge_high_${s}_${d}`;
+        }
+
+        function calculateScore() {
+            clearInterval(timerInterval);
+            const timeTakenSecs = Math.floor((Date.now() - startTime) / 1000);
+            const minMoves = level.solution.length;
+            const size = level.width;
+            
+            // Base score based on grid size and difficulty multiplier
+            const diffMult = document.getElementById('difficulty').value === 'hard' ? 1.5 : (document.getElementById('difficulty').value === 'easy' ? 0.75 : 1.0);
+            let baseScore = size * size * 100 * diffMult;
+
+            // Penalties
+            let movePenalty = Math.max(0, (movesCount - minMoves) * 50);
+            let timePenalty = timeTakenSecs * 10;
+            
+            let finalScore = Math.floor(Math.max(10, baseScore - movePenalty - timePenalty));
+            
+            // Handle High Score
+            const hsKey = getHighScoreKey();
+            let currentHS = parseInt(localStorage.getItem(hsKey) || '0');
+            const stamp = document.getElementById('new-highscore-stamp');
+            
+            if (finalScore > currentHS) {
+                localStorage.setItem(hsKey, finalScore);
+                stamp.style.display = 'block';
+                updateHighScoreDisplay();
+            } else {
+                stamp.style.display = 'none';
+            }
+
+            document.getElementById('win-score-display').textContent = `Score: ${finalScore}`;
+        }
+
+        function updateHighScoreDisplay() {
+            const hs = localStorage.getItem(getHighScoreKey()) || '0';
+            document.getElementById('metric-highscore').textContent = hs;
+        }
+
+        /* =========================================
+           LEVEL GENERATOR
+           ========================================= */
+        class LevelGenerator {
+            constructor(width, height, numColors) { this.W = width; this.H = height; this.targetColors = numColors; }
+            getNeighbors(x, y) {
+                const n = [];
+                if (y > 0) n.push({x, y: y-1}); if (y < this.H - 1) n.push({x, y: y+1});
+                if (x > 0) n.push({x: x-1, y}); if (x < this.W - 1) n.push({x: x+1, y});
+                return n;
+            }
+            generate() {
+                let bestBoard = null; let bestCoverage = 0;
+                for (let attempt = 0; attempt < 30; attempt++) {
+                    const grid = []; const paths = new Map(); let pathIdCtr = 0;
+                    for (let y = 0; y < this.H; y++) {
+                        grid[y] = [];
+                        for (let x = 0; x < this.W; x++) { let id = pathIdCtr++; let cell = { x, y, id, edges: [] }; grid[y][x] = cell; paths.set(id, [cell]); }
+                    }
+                    const getGridNeighbors = (c) => {
+                        let n = [];
+                        if (c.y > 0) n.push(grid[c.y - 1][c.x]); if (c.y < this.H - 1) n.push(grid[c.y + 1][c.x]);
+                        if (c.x > 0) n.push(grid[c.y][c.x - 1]); if (c.x < this.W - 1) n.push(grid[c.y][c.x + 1]);
+                        return n;
+                    };
+                    const isValidPath = (cells) => {
+                        let cellSet = new Set(cells); let totalEdges = 0;
+                        for (let c of cells) {
+                            totalEdges += c.edges.length; let gridNeighborsInPath = 0;
+                            for (let n of getGridNeighbors(c)) if (cellSet.has(n)) gridNeighborsInPath++;
+                            if (gridNeighborsInPath !== c.edges.length) return false;
+                        }
+                        if (totalEdges / 2 !== cells.length - 1) return false;
+                        return true;
+                    };
+                    const splitPath = (startCell, ignoreEdgeTo) => {
+                        let visited = []; let q = [startCell]; let visitedSet = new Set([startCell]);
+                        while (q.length > 0) {
+                            let curr = q.shift(); visited.push(curr);
+                            for (let next of curr.edges) {
+                                if (curr === startCell && next === ignoreEdgeTo) continue;
+                                if (!visitedSet.has(next)) { visitedSet.add(next); q.push(next); }
+                            }
+                        }
+                        return visited;
+                    };
+
+                    let iters = 0; const maxIters = 15000;
+                    while (iters < maxIters) {
+                        iters++;
+                        if (paths.size <= this.targetColors) { let allGood = true; for (let p of paths.values()) if (p.length < 3) allGood = false; if (allGood) break; }
+                        let endpoints = [];
+                        for (let p of paths.values()) for (let c of p) if (c.edges.length <= 1) endpoints.push(c);
+                        if (endpoints.length === 0) break; 
+                        let C = endpoints[Math.floor(Math.random() * endpoints.length)];
+                        let neighbors = getGridNeighbors(C).filter(n => !C.edges.includes(n));
+                        if (neighbors.length === 0) continue;
+                        let N = neighbors[Math.floor(Math.random() * neighbors.length)];
+                        if (N.edges.length <= 1) {
+                            if (C.id === N.id) continue;
+                            let pathC = paths.get(C.id); let pathN = paths.get(N.id);
+                            C.edges.push(N); N.edges.push(C);
+                            let newCells = pathC.concat(pathN);
+                            if (isValidPath(newCells)) {
+                                let newId = pathIdCtr++; let oldCid = C.id, oldNid = N.id;
+                                for (let cell of newCells) cell.id = newId;
+                                paths.delete(oldCid); paths.delete(oldNid); paths.set(newId, newCells);
+                            } else { C.edges.pop(); N.edges.pop(); }
+                        } else {
+                            if (paths.size > this.targetColors && Math.random() > 0.6) continue;
+                            let N2 = N.edges[Math.floor(Math.random() * N.edges.length)];
+                            C.edges.push(N); let idxN = N.edges.indexOf(N2); N.edges[idxN] = C;
+                            let idxN2 = N2.edges.indexOf(N); N2.edges.splice(idxN2, 1);
+                            let newPath1 = splitPath(C, null);
+                            if (isValidPath(newPath1)) {
+                                let newPath2 = splitPath(N2, null); let oldCid = C.id, oldNid = N.id;
+                                paths.delete(oldCid); if (paths.has(oldNid)) paths.delete(oldNid);
+                                let newId1 = pathIdCtr++; for (let cell of newPath1) cell.id = newId1; paths.set(newId1, newPath1);
+                                let newId2 = pathIdCtr++; for (let cell of newPath2) cell.id = newId2; paths.set(newId2, newPath2);
+                            } else { C.edges.pop(); N.edges[idxN] = N2; N2.edges.push(N); }
+                        }
+                    }
+                    let sorted = Array.from(paths.values()).sort((a,b) => b.length - a.length);
+                    let topPaths = sorted.slice(0, this.targetColors);
+                    let coverage = topPaths.reduce((sum, p) => sum + p.length, 0);
+                    if (coverage > bestCoverage && topPaths.length === this.targetColors) { bestCoverage = coverage; bestBoard = topPaths; if (coverage === this.W * this.H) break; }
+                }
+
+                const levelData = { width: this.W, height: this.H, solution: [] };
+                for (let i = 0; i < bestBoard.length; i++) {
+                    let p = bestBoard[i];
+                    let endpoints = p.filter(c => c.edges.length <= 1);
+                    if (endpoints.length !== 2) endpoints = [p[0], p[p.length-1]]; 
+                    let seq = []; let curr = endpoints[0]; let prev = null;
+                    while (curr) { seq.push({x: curr.x, y: curr.y}); let next = curr.edges.find(e => e !== prev); if (!next) break; prev = curr; curr = next; }
+                    levelData.solution.push({ color: currentPalette[i % currentPalette.length], path: seq });
+                }
+                return levelData;
+            }
+        }
+
+        /* =========================================
+           GAME ENGINE & CANVAS DRAWING
+           ========================================= */
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d', { alpha: false }); // Opt for perf
+        const winOverlay = document.getElementById('win-overlay');
+        const allowBreakSelect = document.getElementById('allow-break');
+        const btnUndo = document.getElementById('btn-undo');
+        
+        const settingsModal = document.getElementById('settings-modal');
+        document.getElementById('btn-settings').addEventListener('click', () => settingsModal.classList.add('active'));
+        document.getElementById('btn-close-settings').addEventListener('click', () => {
+            settingsModal.classList.remove('active');
+            updateHighScoreDisplay();
+        });
+
+        let level = null; let playerPaths = {}; let completedPaths = {};
+        let cellSize = 0; let isDrawing = false; let currentDrawColor = null; let undoStack = []; let moveTrackedThisStroke = false;
+
+        function resizeCanvas() {
+            const container = canvas.parentElement; const size = Math.floor(container.clientWidth);
+            canvas.width = size; canvas.height = size;
+            if (level) { cellSize = size / level.width; drawBoard(); }
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function saveState() {
+            const stateStr = JSON.stringify(playerPaths);
+            if (undoStack.length > 0 && undoStack[undoStack.length - 1] === stateStr) return;
+            undoStack.push(stateStr); if (undoStack.length > 50) undoStack.shift();
+            btnUndo.classList.remove('disabled');
+        }
+
+        function triggerUndo() {
+            if (undoStack.length === 0) return;
+            playerPaths = JSON.parse(undoStack.pop());
+            if (undoStack.length === 0) btnUndo.classList.add('disabled');
+            winOverlay.classList.remove('active'); incrementMove(); updateMetrics(); drawBoard();
+        }
+
+        function initGame() {
+            winOverlay.classList.remove('active');
+            const size = parseInt(document.getElementById('grid-size').value);
+            const diff = document.getElementById('difficulty').value;
+            let numColors = Math.floor(size * 0.8);
+            if (diff === 'easy') numColors = Math.floor(size * 0.6);
+            if (diff === 'hard') numColors = Math.floor(size * 1.0);
+            numColors = Math.max(3, Math.min(numColors, currentPalette.length));
+
+            const gen = new LevelGenerator(size, size, numColors);
+            level = gen.generate();
+            
+            undoStack = []; btnUndo.classList.add('disabled');
+            updateHighScoreDisplay(); startTimer(); resetPaths(false); resizeCanvas();
+        }
+
+        function resetPaths(recordMove = true) {
+            if (recordMove) { saveState(); incrementMove(); }
+            playerPaths = {}; completedPaths = {};
+            level.solution.forEach(s => { playerPaths[s.color] = []; completedPaths[s.color] = false; });
+            updateMetrics(); drawBoard();
+        }
+
+        function updateMetrics() {
+            if (!level) return;
+            let connectedCount = 0; let cellsFilled = 0; const totalCells = level.width * level.height;
+            for (let s of level.solution) {
+                const path = playerPaths[s.color]; cellsFilled += path.length; completedPaths[s.color] = false;
+                if (path.length >= 2) {
+                    const pStart = path[0], pEnd = path[path.length - 1], sStart = s.path[0], sEnd = s.path[s.path.length - 1];
+                    const match1 = (pStart.x === sStart.x && pStart.y === sStart.y && pEnd.x === sEnd.x && pEnd.y === sEnd.y);
+                    const match2 = (pStart.x === sEnd.x && pStart.y === sEnd.y && pEnd.x === sStart.x && pEnd.y === sStart.y);
+                    if (match1 || match2) { connectedCount++; completedPaths[s.color] = true; }
+                }
+            }
+            document.getElementById('metric-pipes').textContent = `${connectedCount} / ${level.solution.length}`;
+            const percentage = Math.round((cellsFilled / totalCells) * 100);
+            document.getElementById('metric-coverage').textContent = `${percentage}%`;
+            
+            if (connectedCount === level.solution.length && percentage === 100) {
+                calculateScore();
+                winOverlay.classList.add('active');
+            }
+        }
+
+        function triggerHint() {
+            if (!level || winOverlay.classList.contains('active')) return;
+            let targetColor = null;
+            for (let s of level.solution) {
+                if (playerPaths[s.color].length > 0 && !completedPaths[s.color]) { targetColor = s.color; break; }
+            }
+            if (!targetColor) {
+                for (let s of level.solution) {
+                    let isPerfect = playerPaths[s.color].length === s.path.length && 
+                                    (playerPaths[s.color].every((c, i) => c.x === s.path[i].x && c.y === s.path[i].y) ||
+                                     playerPaths[s.color].every((c, i) => c.x === s.path[s.path.length-1-i].x && c.y === s.path[s.path.length-1-i].y));
+                    if (!isPerfect) { targetColor = s.color; break; }
+                }
+            }
+            if (targetColor) {
+                saveState(); incrementMove();
+                const sol = level.solution.find(s => s.color === targetColor);
+                for (let c in playerPaths) {
+                    if (c === targetColor) continue;
+                    let collisionIdx = playerPaths[c].findIndex(pt => sol.path.some(sPt => sPt.x === pt.x && sPt.y === pt.y));
+                    if (collisionIdx !== -1) playerPaths[c] = playerPaths[c].slice(0, collisionIdx);
+                }
+                playerPaths[targetColor] = JSON.parse(JSON.stringify(sol.path));
+                updateMetrics(); drawBoard();
+            }
+        }
+
+        /* --- Drawing Logic (Theme Aware) --- */
+        function drawBoard() {
+            if (!level || cellSize === 0) return;
+            
+            // Background
+            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--canvas-bg').trim();
+            if(ctx.fillStyle.includes('gradient')) ctx.fillStyle = '#0b0b0e'; // Fallback if gradient parsing fails in JS
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Theme Specific Setup
+            const isRetro = currentTheme === 'theme-retro';
+            const isCyberpunk = currentTheme === 'theme-cyberpunk';
+            const is3D = currentTheme === 'theme-3d';
+            const isMedieval = currentTheme === 'theme-medieval';
+
+            ctx.imageSmoothingEnabled = !isRetro;
+            ctx.lineCap = isRetro ? 'square' : 'round';
+            ctx.lineJoin = isRetro ? 'miter' : 'round';
+
+            // Grid Lines
+            ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--grid-line-color').trim();
+            ctx.lineWidth = isRetro ? 2 : 1;
+            ctx.shadowBlur = 0; // Reset
+            
+            if(isRetro) {
+                for(let i=0; i<=level.width; i++) { ctx.fillRect(i*cellSize - 1, 0, 2, canvas.height); ctx.fillRect(0, i*cellSize - 1, canvas.width, 2); }
+            } else if (isMedieval) {
+                // Dashed map grid
+                ctx.setLineDash([5, 5]);
+                for (let i = 0; i <= level.width; i++) { ctx.beginPath(); ctx.moveTo(i * cellSize, 0); ctx.lineTo(i * cellSize, canvas.height); ctx.stroke(); }
+                for (let i = 0; i <= level.height; i++) { ctx.beginPath(); ctx.moveTo(0, i * cellSize); ctx.lineTo(canvas.width, i * cellSize); ctx.stroke(); }
+                ctx.setLineDash([]);
+            } else {
+                for (let y = 0; y < level.height; y++) {
+                    for (let x = 0; x < level.width; x++) {
+                        ctx.fillStyle = ctx.strokeStyle;
+                        ctx.beginPath();
+                        if(is3D) ctx.roundRect(x * cellSize + 2, y * cellSize + 2, cellSize - 4, cellSize - 4, 8);
+                        else ctx.rect(x * cellSize + 1, y * cellSize + 1, cellSize - 2, cellSize - 2);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            const pathWidth = cellSize * (isRetro ? 0.5 : 0.4);
+            const dotRadius = cellSize * (isRetro ? 0.4 : 0.35);
+
+            // Shadows / Bases
+            for (let color in playerPaths) {
+                const path = playerPaths[color];
+                if (path.length > 1) {
+                    ctx.beginPath();
+                    if (is3D) {
+                        ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = pathWidth + 6;
+                        for (let i = 0; i < path.length; i++) {
+                            const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2 + 4;
+                            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                        }
+                    } else if (isCyberpunk) {
+                        ctx.strokeStyle = color; ctx.lineWidth = pathWidth;
+                        ctx.shadowColor = color; ctx.shadowBlur = 20;
+                        for (let i = 0; i < path.length; i++) {
+                            const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2;
+                            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                        }
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0; // Reset
+                }
+            }
+
+            // Main Paths
+            for (let color in playerPaths) {
+                const path = playerPaths[color];
+                if (path.length > 1) {
+                    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = pathWidth;
+                    
+                    if(isRetro) {
+                        for (let i = 0; i < path.length - 1; i++) {
+                            const p1 = path[i], p2 = path[i+1];
+                            const cx1 = p1.x * cellSize + cellSize/2, cy1 = p1.y * cellSize + cellSize/2;
+                            const cx2 = p2.x * cellSize + cellSize/2, cy2 = p2.y * cellSize + cellSize/2;
+                            ctx.moveTo(cx1, cy1); ctx.lineTo(cx2, cy2);
+                        }
+                    } else {
+                        for (let i = 0; i < path.length; i++) {
+                            const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2;
+                            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                        }
+                    }
+                    ctx.stroke();
+
+                    // Highlights
+                    if (completedPaths[color] || is3D) {
+                        ctx.beginPath(); 
+                        ctx.strokeStyle = is3D ? 'rgba(255, 255, 255, 0.4)' : (isCyberpunk ? '#fff' : 'rgba(255, 255, 255, 0.6)');
+                        ctx.lineWidth = pathWidth * (is3D ? 0.2 : 0.3);
+                        
+                        let offset = is3D ? -2 : 0;
+                        for (let i = 0; i < path.length; i++) {
+                            const px = path[i].x * cellSize + cellSize / 2 + offset, py = path[i].y * cellSize + cellSize / 2 + offset;
+                            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                        }
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Endpoints
+            for (let s of level.solution) {
+                const drawEndpoint = (p) => {
+                    const cx = p.x * cellSize + cellSize / 2, cy = p.y * cellSize + cellSize / 2;
+                    
+                    if (isRetro) {
+                        ctx.fillStyle = s.color;
+                        ctx.fillRect(cx - dotRadius, cy - dotRadius, dotRadius*2, dotRadius*2);
+                        if (completedPaths[s.color]) {
+                            ctx.fillStyle = '#fff';
+                            ctx.fillRect(cx - dotRadius/3, cy - dotRadius/3, (dotRadius/3)*2, (dotRadius/3)*2);
+                        }
+                    } else {
+                        if (is3D) {
+                            ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.beginPath(); ctx.arc(cx, cy + 4, dotRadius + 2, 0, Math.PI * 2); ctx.fill();
+                        } else if (isCyberpunk) {
+                            ctx.shadowColor = s.color; ctx.shadowBlur = 15;
+                        }
+
+                        ctx.fillStyle = (isMedieval || isCyberpunk) ? ctx.strokeStyle : '#222'; // Base ring
+                        ctx.beginPath(); ctx.arc(cx, cy, dotRadius + (is3D?2:0), 0, Math.PI * 2); ctx.fill();
+                        
+                        ctx.shadowBlur = 0;
+                        ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(cx, cy, dotRadius*0.9, 0, Math.PI * 2); ctx.fill();
+
+                        if (completedPaths[s.color] || is3D) { 
+                            ctx.fillStyle = is3D ? 'rgba(255,255,255,0.8)' : '#fff'; 
+                            ctx.beginPath(); ctx.arc(cx - (is3D?2:0), cy - (is3D?2:0), dotRadius * 0.4, 0, Math.PI * 2); ctx.fill(); 
+                        }
+                    }
+                };
+                drawEndpoint(s.path[0]); drawEndpoint(s.path[s.path.length - 1]);
+            }
+        }
+
+        /* --- Drawing Input Logic --- */
+        function getCellFromEvent(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let x = Math.floor((clientX - rect.left) / cellSize); let y = Math.floor((clientY - rect.top) / cellSize);
+            x = Math.max(0, Math.min(level.width - 1, x)); y = Math.max(0, Math.min(level.height - 1, y));
+            return {x, y};
+        }
+
+        function isCellValid(x, y, color) {
+            if (x < 0 || x >= level.width || y < 0 || y >= level.height) return false;
+            for (let s of level.solution) {
+                if (s.color !== color) {
+                    const e1 = s.path[0], e2 = s.path[s.path.length-1];
+                    if ((x === e1.x && y === e1.y) || (x === e2.x && y === e2.y)) return false;
+                }
+            }
+            if (allowBreakSelect.value === 'false') {
+                for (let c in playerPaths) {
+                    if (c === color) continue;
+                    if (playerPaths[c].some(pt => pt.x === x && pt.y === y)) return false;
+                }
+            }
+            if (playerPaths[color].some(pt => pt.x === x && pt.y === y)) return false;
+            return true;
+        }
+
+        function findPathTo(startX, startY, targetX, targetY, color) {
+            let queue = [{x: startX, y: startY, route: []}]; let visited = new Set([`${startX},${startY}`]);
+            let bestRoute = []; let minDist = Math.abs(startX - targetX) + Math.abs(startY - targetY);
+            while (queue.length > 0) {
+                let curr = queue.shift();
+                let dist = Math.abs(curr.x - targetX) + Math.abs(curr.y - targetY);
+                if (dist < minDist) { minDist = dist; bestRoute = curr.route; } 
+                else if (dist === minDist && curr.route.length < bestRoute.length) { bestRoute = curr.route; }
+                if (curr.x === targetX && curr.y === targetY) return curr.route; 
+                const neighbors = [{x: curr.x+1, y: curr.y}, {x: curr.x-1, y: curr.y}, {x: curr.x, y: curr.y+1}, {x: curr.x, y: curr.y-1}];
+                for (let n of neighbors) {
+                    let key = `${n.x},${n.y}`;
+                    if (!visited.has(key) && isCellValid(n.x, n.y, color)) {
+                        visited.add(key); queue.push({x: n.x, y: n.y, route: [...curr.route, {x: n.x, y: n.y}]});
+                    }
+                }
+            }
+            return bestRoute;
+        }
+
+        function handlePointerDown(e) {
+            if (winOverlay.classList.contains('active') || settingsModal.classList.contains('active')) return;
+            const cell = getCellFromEvent(e);
+            moveTrackedThisStroke = false;
+            for (let s of level.solution) {
+                const end1 = s.path[0], end2 = s.path[s.path.length - 1];
+                if ((cell.x === end1.x && cell.y === end1.y) || (cell.x === end2.x && cell.y === end2.y)) {
+                    saveState(); isDrawing = true; currentDrawColor = s.color; playerPaths[currentDrawColor] = [cell];
+                    updateMetrics(); drawBoard(); return;
+                }
+            }
+            for (let color in playerPaths) {
+                const idx = playerPaths[color].findIndex(p => p.x === cell.x && p.y === cell.y);
+                if (idx !== -1) {
+                    saveState(); isDrawing = true; currentDrawColor = color; playerPaths[color] = playerPaths[color].slice(0, idx + 1);
+                    updateMetrics(); drawBoard(); return;
+                }
+            }
+        }
+
+        function handlePointerMove(e) {
+            if (!isDrawing || !currentDrawColor) return;
+            if (e.cancelable) e.preventDefault(); 
+            const cell = getCellFromEvent(e); const path = playerPaths[currentDrawColor]; let lastCell = path[path.length - 1];
+            if (cell.x === lastCell.x && cell.y === lastCell.y) return;
+
+            if(!moveTrackedThisStroke) { incrementMove(); moveTrackedThisStroke = true; }
+
+            const selfIdx = path.findIndex(p => p.x === cell.x && p.y === cell.y);
+            if (selfIdx !== -1) { playerPaths[currentDrawColor] = path.slice(0, selfIdx + 1); updateMetrics(); drawBoard(); return; }
+
+            const sol = level.solution.find(s => s.color === currentDrawColor);
+            const end1 = sol.path[0], end2 = sol.path[sol.path.length - 1];
+            const isLastCellEndpoint = path.length > 1 && ((lastCell.x === end1.x && lastCell.y === end1.y) || (lastCell.x === end2.x && lastCell.y === end2.y));
+            if (isLastCellEndpoint) return; 
+
+            const route = findPathTo(lastCell.x, lastCell.y, cell.x, cell.y, currentDrawColor);
+            if (route.length > 0) {
+                for (let step of route) {
+                    if (allowBreakSelect.value === 'true') {
+                        for (let c in playerPaths) {
+                            if (c === currentDrawColor) continue;
+                            const collisionIdx = playerPaths[c].findIndex(p => p.x === step.x && p.y === step.y);
+                            if (collisionIdx !== -1) playerPaths[c] = playerPaths[c].slice(0, collisionIdx);
+                        }
+                    }
+                    path.push(step);
+                    if ((step.x === end1.x && step.y === end1.y) || (step.x === end2.x && step.y === end2.y)) break;
+                }
+                updateMetrics(); drawBoard();
+            }
+        }
+
+        function handlePointerUp() { if (isDrawing) { isDrawing = false; currentDrawColor = null; updateMetrics(); drawBoard(); } }
+
+        canvas.addEventListener('mousedown', handlePointerDown); window.addEventListener('mousemove', handlePointerMove); window.addEventListener('mouseup', handlePointerUp);
+        canvas.addEventListener('touchstart', handlePointerDown, {passive: false}); window.addEventListener('touchmove', handlePointerMove, {passive: false}); window.addEventListener('touchend', handlePointerUp);
+
+        document.getElementById('btn-new').addEventListener('click', initGame);
+        document.getElementById('btn-reset').addEventListener('click', () => resetPaths(true));
+        document.getElementById('btn-hint').addEventListener('click', triggerHint);
+        document.getElementById('btn-undo').addEventListener('click', triggerUndo);
+        document.getElementById('btn-next').addEventListener('click', initGame);
+        document.getElementById('grid-size').addEventListener('change', initGame);
+        document.getElementById('difficulty').addEventListener('change', initGame);
+
+        initGame();
+    </script>
+</body>
+</html>
