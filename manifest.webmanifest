@@ -1,0 +1,23 @@
+{
+  "name": "Flow Forge",
+  "short_name": "Flow Forge",
+  "description": "A no-double-back Flow-style puzzle generator with themed boards.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#090b10",
+  "theme_color": "#0d1018",
+  "categories": [
+    "games",
+    "puzzle"
+  ],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
