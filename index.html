@@ -1,689 +1,2973 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#16161c" id="meta-theme-color">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Flow Forge</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Orbitron:wght@500;800&family=Press+Start+2P&family=Righteous&display=swap" rel="stylesheet">
-    <link id="manifest-link" rel="manifest" href="">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d1018" />
+  <title>Flow Forge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@500;700;900&family=Righteous&family=Press+Start+2P&family=Inter:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090b10;
+      --bg-2: #10131c;
+      --panel: rgba(20, 24, 35, 0.88);
+      --panel-solid: #151926;
+      --text: #f4f7ff;
+      --muted: #9da8bd;
+      --border: rgba(255, 255, 255, 0.1);
+      --accent: #61a8ff;
+      --accent-2: #9dd0ff;
+      --danger: #ff5c7a;
+      --good: #5ee6a8;
+      --button-text: #06101f;
+      --canvas-bg: #0b0f17;
+      --canvas-tile: rgba(255,255,255,0.025);
+      --grid-line: rgba(255,255,255,0.095);
+      --grid-strong: rgba(255,255,255,0.16);
+      --path-outline: rgba(0,0,0,0.85);
+      --shadow: 0 20px 70px rgba(0,0,0,0.45);
+      --radius: 20px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
-    <style>
-        :root {
-            --bg-color: #0b0b0e; --panel-bg: #16161c; --text-color: #f0f0f5;
-            --border-color: #2a2a35; --accent-color: #4a90e2;
-            --font-family: 'Segoe UI', system-ui, sans-serif;
-            --header-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            --canvas-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            --canvas-bg: #0b0b0e; --btn-text: #fff;
-        }
+    body.theme-neon {
+      --bg: #03020a;
+      --bg-2: #09051b;
+      --panel: rgba(8, 8, 24, 0.86);
+      --panel-solid: #0a0820;
+      --text: #eaffff;
+      --muted: #85d8e2;
+      --border: rgba(0,255,255,0.22);
+      --accent: #00f5ff;
+      --accent-2: #ff4dff;
+      --button-text: #02030c;
+      --canvas-bg: #050611;
+      --canvas-tile: rgba(0,255,255,0.025);
+      --grid-line: rgba(0, 245, 255, 0.16);
+      --grid-strong: rgba(255, 77, 255, 0.22);
+      --path-outline: rgba(2,3,12,0.95);
+    }
 
-        /* --- THEME: CYBERPUNK NEON --- */
-        body.theme-cyberpunk {
-            --bg-color: #020205; --panel-bg: rgba(8, 8, 15, 0.9); --text-color: #0ff;
-            --border-color: #f0f; --accent-color: #0ff;
-            --font-family: 'Orbitron', sans-serif;
-            --header-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
-            --canvas-shadow: 0 0 40px rgba(0, 255, 255, 0.2), inset 0 0 20px rgba(255, 0, 255, 0.2);
-            --canvas-bg: #05050a; --btn-text: #020205;
-            background-image: linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-        body.theme-cyberpunk * { text-shadow: 0 0 4px rgba(0, 255, 255, 0.4); }
-        body.theme-cyberpunk button.primary { box-shadow: 0 0 15px var(--accent-color); font-weight: 800; border: 2px solid #fff; }
-        body.theme-cyberpunk .metrics { border: 1px solid #0ff; }
+    body.theme-parchment {
+      --bg: #33241a;
+      --bg-2: #4a3322;
+      --panel: rgba(69, 47, 31, 0.9);
+      --panel-solid: #3f2a1e;
+      --text: #fff3d2;
+      --muted: #d6bd8f;
+      --border: rgba(255, 214, 143, 0.22);
+      --accent: #ffc857;
+      --accent-2: #e89035;
+      --button-text: #2c1d12;
+      --canvas-bg: #51351f;
+      --canvas-tile: rgba(255, 226, 169, 0.045);
+      --grid-line: rgba(255, 218, 145, 0.19);
+      --grid-strong: rgba(63, 34, 13, 0.35);
+      --path-outline: rgba(36, 20, 8, 0.92);
+    }
 
-        /* --- THEME: VAPORWAVE --- */
-        body.theme-vaporwave {
-            --bg-color: #ff99cc; --panel-bg: rgba(255, 255, 255, 0.85); --text-color: #2b1055;
-            --border-color: #41f2ff; --accent-color: #ff71ce;
-            --font-family: 'Righteous', cursive;
-            --header-shadow: 0 8px 32px rgba(255, 113, 206, 0.3);
-            --canvas-shadow: 0 15px 40px rgba(43, 16, 85, 0.4), inset 0 0 0 6px #ff71ce;
-            --canvas-bg: rgba(255,255,255,0.8); --btn-text: #fff;
-            background: linear-gradient(180deg, #ff99cc 0%, #7597de 100%);
-            letter-spacing: 1px;
-        }
-        body.theme-vaporwave::before {
-            content: ""; position: fixed; bottom: 0; left: 0; width: 100vw; height: 40vh; z-index: -1;
-            background: 
-                linear-gradient(rgba(255, 113, 206, 0.4) 2px, transparent 2px),
-                linear-gradient(90deg, rgba(255, 113, 206, 0.4) 2px, transparent 2px);
-            background-size: 40px 20px, 40px 40px;
-            transform: perspective(500px) rotateX(60deg);
-        }
-        body.theme-vaporwave header { background: linear-gradient(90deg, #41f2ff, #ff71ce); border-bottom: 3px solid #fff; }
-        body.theme-vaporwave h1 { -webkit-text-fill-color: #fff; text-shadow: 2px 2px 0px #ff71ce; background: none; }
-        body.theme-vaporwave .metrics { border: 3px solid #fff; box-shadow: 6px 6px 0px #41f2ff; }
+    body.theme-retro {
+      --bg: #050505;
+      --bg-2: #0b0b0b;
+      --panel: rgba(15, 15, 15, 0.94);
+      --panel-solid: #111;
+      --text: #f5f5f5;
+      --muted: #b7b7b7;
+      --border: rgba(255,255,255,0.22);
+      --accent: #fff200;
+      --accent-2: #00ff9c;
+      --button-text: #000;
+      --canvas-bg: #000;
+      --canvas-tile: rgba(255,255,255,0.02);
+      --grid-line: rgba(255,255,255,0.18);
+      --grid-strong: rgba(255,255,255,0.32);
+      --path-outline: #000;
+      --font: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      image-rendering: pixelated;
+    }
 
-        /* --- THEME: MEDIEVAL TAVERN --- */
-        body.theme-medieval {
-            --bg-color: #3e2723; --panel-bg: #4e342e; --text-color: #d7ccc8;
-            --border-color: #27140c; --accent-color: #ffb300;
-            --font-family: 'Cinzel', serif;
-            --header-shadow: 0 8px 16px rgba(0,0,0,0.8);
-            --canvas-shadow: 0 15px 35px rgba(0,0,0,0.9), inset 0 0 30px rgba(0, 0, 0, 0.6);
-            --canvas-bg: transparent; --btn-text: #3e2723;
-            /* Wood Grain Background */
-            background-color: #4a3022;
-            background-image: 
-                repeating-radial-gradient(circle at 50% 50%, rgba(0,0,0,0.05) 0, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 4px),
-                linear-gradient(90deg, #3e2723, #4e342e, #3e2723);
-        }
-        body.theme-medieval header { background: #27140c; border-bottom: 4px solid #1a0d08; }
-        body.theme-medieval .metrics, body.theme-medieval .modal-content { background: #3e2723; border: 2px solid #1a0d08; box-shadow: inset 0 0 10px #000; }
-        body.theme-medieval h1 { font-size: 24px; -webkit-text-fill-color: #ffb300; text-shadow: 2px 2px 4px #000; font-weight: 900; background: none;}
-        body.theme-medieval select, body.theme-medieval button.action { background: #5d4037; color: #d7ccc8; border: 2px solid #27140c; }
-        body.theme-medieval button.primary { background: #ffb300; color: #3e2723; font-weight: 900; }
+    body.theme-soft {
+      --bg: #f4f7fb;
+      --bg-2: #e8eef7;
+      --panel: rgba(255,255,255,0.88);
+      --panel-solid: #fff;
+      --text: #111827;
+      --muted: #5f6c80;
+      --border: rgba(17, 24, 39, 0.12);
+      --accent: #315efb;
+      --accent-2: #17a6ff;
+      --button-text: #fff;
+      --canvas-bg: #ffffff;
+      --canvas-tile: rgba(49,94,251,0.025);
+      --grid-line: rgba(17, 24, 39, 0.12);
+      --grid-strong: rgba(17, 24, 39, 0.2);
+      --path-outline: rgba(255,255,255,0.92);
+      --shadow: 0 25px 70px rgba(47, 78, 132, 0.18);
+    }
 
-        /* --- THEME: 3D HIGH-GLOSS --- */
-        body.theme-3d {
-            --bg-color: #121212; --panel-bg: #1e1e1e; --text-color: #e0e0e0;
-            --border-color: #333; --accent-color: #007AFF;
-            --font-family: system-ui, -apple-system, sans-serif;
-            --canvas-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.05);
-            --canvas-bg: #1a1a1a; --btn-text: #fff;
-            background: radial-gradient(circle at top center, #2a2a2a, #121212);
-        }
-        body.theme-3d button { box-shadow: inset 0 1px 1px rgba(255,255,255,0.3), 0 4px 6px rgba(0,0,0,0.4); border: 1px solid #000; }
-        body.theme-3d button:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); transform: translateY(2px); }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      color: var(--text);
+      font-family: var(--font);
+      background:
+        radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 26%, transparent), transparent 34rem),
+        radial-gradient(circle at bottom right, color-mix(in srgb, var(--accent-2) 22%, transparent), transparent 30rem),
+        linear-gradient(135deg, var(--bg), var(--bg-2));
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
 
-        /* --- THEME: 8-BIT RETRO --- */
-        body.theme-retro {
-            --bg-color: #000; --panel-bg: #111; --text-color: #fff;
-            --border-color: #444; --accent-color: #ff0000;
-            --font-family: 'Press Start 2P', monospace;
-            --header-shadow: none; --canvas-shadow: none;
-            --canvas-bg: #000; --btn-text: #fff;
-            text-transform: uppercase;
-        }
-        body.theme-retro * { border-radius: 0 !important; font-size: 10px; }
-        body.theme-retro header, body.theme-retro .metrics, body.theme-retro .modal-content, body.theme-retro .action-buttons button { 
-            border: 4px solid var(--border-color); box-shadow: 4px 4px 0px rgba(255,255,255,0.1); 
-        }
-        body.theme-retro canvas { border: 4px solid #444; }
-        body.theme-retro h1 { font-size: 16px; -webkit-text-fill-color: #fff; background: none;}
-        
-        /* CRT Overlay for Cyberpunk & Retro */
-        .crt-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; display: none;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 4px, 6px 100%;
-        }
-        body.theme-retro .crt-overlay, body.theme-cyberpunk .crt-overlay { display: block; }
-        
-        /* Base Structure */
-        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-        body { margin: 0; padding: 0; color: var(--text-color); display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow: hidden; padding-bottom: env(safe-area-inset-bottom); transition: background 0.4s, color 0.4s; }
-        header { width: 100%; padding: max(16px, env(safe-area-inset-top)) 20px 16px 20px; background-color: var(--panel-bg); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); box-shadow: var(--header-shadow); z-index: 10; }
-        h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; background: linear-gradient(90deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
-        .stats-bar { display: flex; gap: 15px; font-size: 13px; font-weight: bold; opacity: 0.9; align-items: center; }
-        .header-controls { display: flex; gap: 10px; align-items: center; }
-        .install-btn { background: var(--accent-color); color: var(--btn-text); border: none; padding: 8px 14px; border-radius: 16px; font-size: 11px; font-family: inherit; font-weight: bold; text-transform: uppercase; cursor: pointer; display: none; }
-        .install-btn.visible { display: block; }
-        .icon-btn { background: none; border: none; color: var(--text-color); cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; padding: 20px; flex-grow: 1; gap: 15px; }
-        .metrics { width: 100%; display: flex; justify-content: space-around; background: var(--panel-bg); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--header-shadow); }
-        .metric-item { display: flex; flex-direction: column; align-items: center; }
-        .metric-label { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-        .metric-value { font-size: 20px; font-weight: bold; color: var(--accent-color); }
-        .canvas-container { position: relative; width: 100%; aspect-ratio: 1 / 1; max-width: 500px; background: var(--canvas-bg); border-radius: 12px; box-shadow: var(--canvas-shadow); touch-action: none; }
-        canvas { display: block; width: 100%; height: 100%; border-radius: 12px; }
-        .action-buttons { display: flex; gap: 10px; width: 100%; max-width: 500px; }
-        button.action { flex: 1; padding: 14px 8px; font-weight: bold; font-size: 12px; font-family: inherit; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; background: var(--panel-bg); color: var(--text-color); text-transform: uppercase; display: flex; align-items: center; justify-content: center; letter-spacing: 1px; }
-        button.action.primary { background: var(--accent-color); color: var(--btn-text); border: none; flex: 1.2; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 100; }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-content { background: var(--panel-bg); width: 90%; max-width: 360px; padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); transform: scale(0.95); transition: transform 0.25s ease; }
-        .modal-overlay.active .modal-content { transform: scale(1); }
-        .modal-header { font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
-        .control-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .control-group label { font-size: 12px; font-weight: bold; text-transform: uppercase; }
-        select { background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; font-size: 12px; font-family: var(--font-family); min-width: 140px; outline: none; }
-        .btn-full { width: 100%; margin-top: 20px; padding: 14px; background: var(--accent-color); color: var(--btn-text); border: none; border-radius: 8px; font-family: inherit; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .win-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--panel-bg); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 10; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
-        .win-overlay.active { opacity: 0.95; pointer-events: auto; }
-        .win-overlay h2 { font-size: 28px; margin-bottom: 10px; color: var(--accent-color); }
-        .win-score { font-size: 18px; margin-bottom: 20px; }
-        .high-score-stamp { color: #f1c40f; font-weight: bold; margin-bottom: 20px; font-size: 14px; animation: pulse 1.5s infinite; text-shadow: 0 0 10px #f1c40f; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
-        .disabled { opacity: 0.4; pointer-events: none; }
-    </style>
+    body.theme-parchment {
+      background-color: #3a2719;
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(255,231,179,0.13), transparent 22rem),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 16px),
+        linear-gradient(135deg, var(--bg), var(--bg-2));
+    }
+
+    body.theme-neon::after,
+    body.theme-retro::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10000;
+      background:
+        linear-gradient(rgba(255,255,255,0.035) 50%, rgba(0,0,0,0.08) 50%),
+        linear-gradient(90deg, rgba(255,0,0,0.035), rgba(0,255,0,0.015), rgba(0,0,255,0.035));
+      background-size: 100% 4px, 7px 100%;
+      mix-blend-mode: screen;
+      opacity: 0.45;
+    }
+
+    .app {
+      min-height: 100dvh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: max(14px, env(safe-area-inset-top)) clamp(12px, 3vw, 26px) 12px;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+    }
+
+    .brand {
+      min-width: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(18px, 4vw, 28px);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .top-stats {
+      justify-self: center;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel) 72%, transparent);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.13);
+    }
+
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.045);
+      font-weight: 800;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      justify-self: end;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .icon-button, button {
+      font: inherit;
+    }
+
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 82%, transparent);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .main {
+      width: min(100%, 760px);
+      margin: 0 auto;
+      padding: clamp(12px, 2.4vw, 24px);
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 9px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 10px;
+      box-shadow: 0 10px 32px rgba(0,0,0,0.12);
+      min-width: 0;
+    }
+
+    .metric-label {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .metric-value {
+      display: block;
+      margin-top: 4px;
+      color: var(--accent);
+      font-size: clamp(18px, 5vw, 28px);
+      font-weight: 950;
+      letter-spacing: -0.04em;
+    }
+
+    .board-shell {
+      position: relative;
+      width: min(100%, 590px);
+      justify-self: center;
+      padding: clamp(8px, 1.8vw, 14px);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) + 10px);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.09), transparent 34%),
+        color-mix(in srgb, var(--panel-solid) 85%, transparent);
+      box-shadow: var(--shadow);
+    }
+
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--canvas-bg);
+      touch-action: none;
+      contain: layout paint size;
+      box-shadow: inset 0 0 0 1px var(--grid-strong), inset 0 30px 60px rgba(255,255,255,0.035);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius);
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    .status-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .status-strip strong { color: var(--text); }
+
+    .actions {
+      width: min(100%, 590px);
+      justify-self: center;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .button {
+      min-height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .button.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: var(--button-text);
+      border: 0;
+    }
+
+    .button:disabled,
+    .button.disabled {
+      opacity: 0.42;
+      pointer-events: none;
+    }
+
+    .button:active,
+    .icon-button:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .win-overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background: rgba(0,0,0,0.68);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+    }
+
+    .win-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .win-card {
+      width: min(92%, 380px);
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: color-mix(in srgb, var(--panel-solid) 94%, transparent);
+      padding: 22px;
+      box-shadow: 0 28px 80px rgba(0,0,0,0.35);
+      transform: translateY(6px) scale(0.98);
+      transition: transform 180ms ease;
+    }
+
+    .win-overlay.active .win-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .win-card h2 {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 8vw, 44px);
+      letter-spacing: -0.05em;
+    }
+
+    .win-card p {
+      margin: 8px 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .score-big {
+      color: var(--accent);
+      font-weight: 950;
+      font-size: 32px;
+      letter-spacing: -0.05em;
+    }
+
+    .new-best {
+      display: none;
+      margin: 10px 0 16px;
+      color: #ffd45a;
+      font-weight: 950;
+      text-shadow: 0 0 18px rgba(255,212,90,0.35);
+    }
+
+    .new-best.active { display: block; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0,0,0,0.66);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      width: min(100%, 460px);
+      max-height: min(760px, calc(100dvh - 36px));
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: var(--panel-solid);
+      color: var(--text);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.45);
+      transform: translateY(8px) scale(0.98);
+      transition: transform 180ms ease;
+    }
+
+    .modal.active .modal-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-head {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel-solid) 94%, transparent);
+      backdrop-filter: blur(12px);
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .modal-body {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .control {
+      display: grid;
+      gap: 7px;
+    }
+
+    .control label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    select {
+      width: 100%;
+      min-height: 44px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--bg) 72%, #000 0%);
+      color: var(--text);
+      padding: 0 12px;
+      font: inherit;
+      font-weight: 800;
+      outline: none;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      min-height: 34px;
+      cursor: pointer;
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .range-value {
+      min-width: 48px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 80%, #000 20%);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .control small {
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 620px) {
+      header {
+        grid-template-columns: 1fr auto;
+      }
+      .top-stats {
+        order: 3;
+        grid-column: 1 / -1;
+        justify-self: stretch;
+        justify-content: center;
+      }
+      .subtitle { display: none; }
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .actions {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .actions .primary { grid-column: span 2; }
+    }
+
+    @media (max-width: 390px) {
+      .stat-pill { font-size: 12px; padding-inline: 8px; }
+      .button { font-size: 12px; }
+      .metric { padding: 9px; }
+    }
+
+
+    /* =======================================================
+       Five distinct visual systems
+       ======================================================= */
+    body.theme-plain {
+      --bg: #f8fafc; --bg-2: #e2e8f0; --panel: rgba(255,255,255,0.92); --panel-solid: #ffffff;
+      --text: #0f172a; --muted: #64748b; --border: rgba(15,23,42,0.13); --accent: #2563eb; --accent-2: #0ea5e9;
+      --button-text: #fff; --canvas-bg: #ffffff; --canvas-tile: rgba(15,23,42,0.018); --grid-line: rgba(15,23,42,0.14); --grid-strong: rgba(15,23,42,0.22);
+      --path-outline: rgba(255,255,255,0.9); --shadow: 0 22px 65px rgba(51,65,85,0.16); --radius: 14px; --font: Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+    body.theme-3d {
+      --bg: #101114; --bg-2: #272b33; --panel: rgba(28,31,38,0.9); --panel-solid: #1a1d24;
+      --text: #f6f8ff; --muted: #aeb8cb; --border: rgba(255,255,255,0.13); --accent: #58a6ff; --accent-2: #a6d8ff;
+      --button-text: #07111f; --canvas-bg: #161a22; --canvas-tile: rgba(255,255,255,0.04); --grid-line: rgba(255,255,255,0.095); --grid-strong: rgba(255,255,255,0.18);
+      --path-outline: rgba(0,0,0,0.92); --shadow: 0 34px 90px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); --radius: 24px; --font: "Trebuchet MS", Inter, ui-sans-serif, sans-serif;
+    }
+    body.theme-cyberpunk {
+      --bg: #02030b; --bg-2: #0b0623; --panel: rgba(7,8,25,0.88); --panel-solid: #070819;
+      --text: #eaffff; --muted: #7de4ee; --border: rgba(0,245,255,0.25); --accent: #00f5ff; --accent-2: #ff2bd6;
+      --button-text: #02030b; --canvas-bg: #030511; --canvas-tile: rgba(0,245,255,0.035); --grid-line: rgba(0,245,255,0.18); --grid-strong: rgba(255,43,214,0.28);
+      --path-outline: rgba(0,0,8,0.96); --shadow: 0 0 50px rgba(0,245,255,0.13), 0 0 90px rgba(255,43,214,0.11); --radius: 8px; --font: Orbitron, Inter, ui-sans-serif, sans-serif;
+    }
+    body.theme-medieval {
+      --bg: #2a170d; --bg-2: #56351f; --panel: rgba(72,45,26,0.92); --panel-solid: #432817;
+      --text: #ffe9b8; --muted: #d7bc83; --border: rgba(255,205,112,0.28); --accent: #f5b642; --accent-2: #b5651d;
+      --button-text: #2b180c; --canvas-bg: #5b351b; --canvas-tile: rgba(255,214,143,0.05); --grid-line: rgba(34,17,6,0.42); --grid-strong: rgba(255,214,143,0.28);
+      --path-outline: rgba(36,18,6,0.96); --shadow: 0 25px 75px rgba(0,0,0,0.62), inset 0 0 30px rgba(0,0,0,0.18); --radius: 12px; --font: Cinzel, Georgia, serif;
+    }
+    body.theme-vaporwave {
+      --bg: #ff8bd4; --bg-2: #6f8cff; --panel: rgba(255,255,255,0.78); --panel-solid: #fff2fb;
+      --text: #35105f; --muted: #67409b; --border: rgba(255,255,255,0.65); --accent: #ff71ce; --accent-2: #01cdfe;
+      --button-text: #ffffff; --canvas-bg: #ffd8f2; --canvas-tile: rgba(255,255,255,0.32); --grid-line: rgba(65,242,255,0.48); --grid-strong: rgba(255,113,206,0.75);
+      --path-outline: rgba(255,255,255,0.95); --shadow: 12px 14px 0 rgba(1,205,254,0.32), 0 28px 70px rgba(53,16,95,0.24); --radius: 28px; --font: Righteous, Inter, ui-sans-serif, sans-serif;
+    }
+
+    body.theme-plain { background: linear-gradient(135deg, #f8fafc, #e2e8f0); }
+    body.theme-plain header { background: rgba(255,255,255,0.86); box-shadow: 0 1px 0 rgba(15,23,42,0.08); }
+    body.theme-plain h1 { letter-spacing: -0.04em; text-transform: none; }
+    body.theme-plain .metric, body.theme-plain .board-shell, body.theme-plain .button, body.theme-plain .modal-card { box-shadow: 0 10px 34px rgba(51,65,85,0.11); }
+
+    body.theme-3d { background: radial-gradient(circle at 50% -10%, #3b4250, transparent 34rem), linear-gradient(145deg, #0f1013, #282d36); }
+    body.theme-3d header { background: linear-gradient(180deg, rgba(46,50,59,0.94), rgba(22,25,31,0.92)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 18px 38px rgba(0,0,0,0.35); }
+    body.theme-3d .button, body.theme-3d .icon-button, body.theme-3d select { box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 8px 18px rgba(0,0,0,0.32); border-bottom-color: rgba(0,0,0,0.55); }
+    body.theme-3d .button.primary { background: linear-gradient(180deg, #c7e8ff, #58a6ff 48%, #1b65c7); color: #04101d; }
+    body.theme-3d .board-shell { background: linear-gradient(145deg, rgba(255,255,255,0.16), rgba(0,0,0,0.08)), #1d2129; }
+
+    body.theme-cyberpunk { background: radial-gradient(circle at 20% 15%, rgba(255,43,214,0.18), transparent 24rem), radial-gradient(circle at 80% 0%, rgba(0,245,255,0.22), transparent 22rem), #02030b; }
+    body.theme-cyberpunk::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1; background: linear-gradient(rgba(0,245,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,43,214,0.035) 1px, transparent 1px); background-size: 42px 42px; }
+    body.theme-cyberpunk::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 10000; background: linear-gradient(rgba(255,255,255,0.03) 50%, rgba(0,0,0,0.1) 50%), linear-gradient(90deg, rgba(255,0,0,0.035), rgba(0,255,0,0.015), rgba(0,0,255,0.035)); background-size: 100% 4px, 7px 100%; mix-blend-mode: screen; opacity: 0.55; }
+    body.theme-cyberpunk header { border-bottom: 1px solid #00f5ff; box-shadow: 0 0 28px rgba(0,245,255,0.2), inset 0 -1px 0 rgba(255,43,214,0.8); }
+    body.theme-cyberpunk h1 { color: #fff; text-shadow: 0 0 12px #00f5ff, 3px 0 0 rgba(255,43,214,0.75); }
+    body.theme-cyberpunk .metric, body.theme-cyberpunk .board-shell, body.theme-cyberpunk .modal-card { border-color: rgba(0,245,255,0.32); box-shadow: 0 0 26px rgba(0,245,255,0.14), inset 0 0 18px rgba(255,43,214,0.08); }
+    body.theme-cyberpunk .button { border-radius: 3px; clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); text-shadow: 0 0 8px currentColor; }
+
+    body.theme-medieval { background-color: #3b2515; background-image: radial-gradient(circle at 20% 12%, rgba(255,212,138,0.13), transparent 22rem), repeating-linear-gradient(90deg, rgba(0,0,0,0.11) 0 2px, transparent 2px 58px), linear-gradient(90deg, #2a170d, #5d3a22, #2a170d); }
+    body.theme-medieval header { background: #251307; border-bottom: 5px ridge #8c5a28; box-shadow: 0 12px 22px rgba(0,0,0,0.65); }
+    body.theme-medieval h1 { color: #ffd275; text-shadow: 2px 2px 0 #160a03, 0 0 16px rgba(255,190,75,0.25); letter-spacing: 0.08em; }
+    body.theme-medieval .metric, body.theme-medieval .modal-card { background: #402512; border: 3px ridge #91612d; }
+    body.theme-medieval .board-shell { border: 8px ridge #8c5a28; background: radial-gradient(circle at 30% 20%, rgba(255,222,161,0.08), transparent 14rem), #3e2412; }
+    body.theme-medieval .button, body.theme-medieval select, body.theme-medieval .icon-button { border: 3px ridge #8c5a28; background: #5a351d; color: #ffe9b8; border-radius: 6px; }
+    body.theme-medieval .button.primary { background: linear-gradient(180deg, #ffd275, #b86e21); color: #281305; }
+
+    body.theme-vaporwave { background: linear-gradient(180deg, #ff8bd4 0%, #8c86ff 56%, #281b68 100%); letter-spacing: 0.02em; }
+    body.theme-vaporwave::before { content: ""; position: fixed; left: -10vw; right: -10vw; bottom: -18vh; height: 46vh; pointer-events: none; z-index: -1; background: linear-gradient(rgba(255,255,255,0.55) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.45) 2px, transparent 2px); background-size: 100% 32px, 44px 100%; transform: perspective(460px) rotateX(62deg); transform-origin: bottom; opacity: 0.55; }
+    body.theme-vaporwave header { background: linear-gradient(90deg, rgba(1,205,254,0.8), rgba(255,113,206,0.9)); border-bottom: 4px solid #fff; }
+    body.theme-vaporwave h1 { color: #fff; text-shadow: 4px 4px 0 #ff71ce, 7px 7px 0 #01cdfe; }
+    body.theme-vaporwave .metric, body.theme-vaporwave .modal-card { border: 3px solid #fff; box-shadow: 7px 7px 0 rgba(1,205,254,0.42); }
+    body.theme-vaporwave .board-shell { border: 4px solid #fff; background: linear-gradient(135deg, rgba(255,255,255,0.65), rgba(255,113,206,0.22)); }
+    body.theme-vaporwave .button { border: 3px solid #fff; background: rgba(255,255,255,0.76); color: #35105f; box-shadow: 5px 5px 0 rgba(1,205,254,0.38); }
+    body.theme-vaporwave .button.primary { background: linear-gradient(90deg, #ff71ce, #01cdfe); color: #fff; }
+
+
+    /* =======================================================
+       Final theme pass: dark plain mode + 8-bit + tighter endpoint halos
+       ======================================================= */
+    body.theme-plain {
+      --bg: #070a10; --bg-2: #121722; --panel: rgba(18,23,34,0.92); --panel-solid: #111722;
+      --text: #eef4ff; --muted: #9da9bd; --border: rgba(255,255,255,0.11); --accent: #60a5fa; --accent-2: #22d3ee;
+      --button-text: #06101f; --canvas-bg: #0b1019; --canvas-tile: rgba(255,255,255,0.025); --grid-line: rgba(255,255,255,0.105); --grid-strong: rgba(255,255,255,0.18);
+      --path-outline: rgba(0,0,0,0.86); --shadow: 0 24px 70px rgba(0,0,0,0.42); --radius: 16px; --font: Inter, ui-sans-serif, system-ui, sans-serif;
+      background: radial-gradient(circle at 18% 0%, rgba(96,165,250,0.18), transparent 26rem), radial-gradient(circle at 100% 70%, rgba(34,211,238,0.12), transparent 24rem), linear-gradient(135deg, #070a10, #121722);
+    }
+    body.theme-plain header { background: rgba(12,17,27,0.88); box-shadow: 0 1px 0 rgba(255,255,255,0.08), 0 16px 40px rgba(0,0,0,0.26); }
+    body.theme-plain h1 { letter-spacing: -0.035em; text-transform: none; color: #f8fbff; }
+    body.theme-plain .metric, body.theme-plain .board-shell, body.theme-plain .button, body.theme-plain .modal-card { box-shadow: 0 14px 44px rgba(0,0,0,0.26); }
+    body.theme-plain .button.primary { background: linear-gradient(180deg, #93c5fd, #3b82f6); color: #031225; }
+
+    body.theme-8bit {
+      --bg: #050505; --bg-2: #111; --panel: #111; --panel-solid: #090909;
+      --text: #f8f8f8; --muted: #b8b8b8; --border: #f8f8f8; --accent: #fff200; --accent-2: #00ff66;
+      --button-text: #000; --canvas-bg: #000; --canvas-tile: rgba(255,255,255,0.03); --grid-line: rgba(255,255,255,0.22); --grid-strong: #f8f8f8;
+      --path-outline: #000; --shadow: none; --radius: 0; --font: 'Press Start 2P', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #050505;
+      image-rendering: pixelated;
+    }
+    body.theme-8bit * { border-radius: 0 !important; }
+    body.theme-8bit header { background: #080808; border-bottom: 4px solid #f8f8f8; box-shadow: 0 4px 0 #3a3a3a; }
+    body.theme-8bit h1 { color: #fff200; text-shadow: 3px 3px 0 #ff006e; font-size: clamp(12px, 3.2vw, 18px); }
+    body.theme-8bit .subtitle { font-size: 8px; }
+    body.theme-8bit .metric, body.theme-8bit .board-shell, body.theme-8bit .modal-card, body.theme-8bit .top-stats { border: 4px solid #f8f8f8; box-shadow: 5px 5px 0 #3a3a3a; background: #101010; }
+    body.theme-8bit .button, body.theme-8bit .icon-button, body.theme-8bit select { border: 4px solid #f8f8f8; background: #111; color: #f8f8f8; box-shadow: 4px 4px 0 #3a3a3a; text-transform: uppercase; }
+    body.theme-8bit .button.primary { background: #fff200; color: #000; }
+    body.theme-8bit .button:active, body.theme-8bit .icon-button:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #3a3a3a; }
+
+
+
+
+    /* =======================================================
+       Minimal HUD + sharper style pass
+       ======================================================= */
+    .main { gap: 10px; padding-top: clamp(8px, 1.8vw, 18px); }
+    header { grid-template-columns: minmax(0, 1fr) auto auto; padding-bottom: 9px; }
+    .subtitle { display: none; }
+    .top-stats { padding: 4px; gap: 4px; box-shadow: none; }
+    .stat-pill { padding: 5px 8px; font-size: 12px; background: transparent; }
+    .metrics {
+      width: min(100%, 590px);
+      justify-self: center;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      padding: 4px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel) 82%, transparent);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.16);
+    }
+    .metric { padding: 6px 8px; background: transparent !important; border: 0 !important; box-shadow: none !important; text-align: center; }
+    .metric + .metric { border-left: 1px solid var(--border) !important; }
+    .metric-label { font-size: 8.5px; letter-spacing: .07em; }
+    .metric-value { font-size: clamp(14px, 3.5vw, 20px); margin-top: 2px; }
+    .board-shell { padding: clamp(6px, 1.2vw, 10px); }
+    .status-strip { margin-top: 7px; font-size: 11px; opacity: .88; }
+    .actions { gap: 6px; }
+    .button { min-height: 42px; font-size: 12px; letter-spacing: .04em; }
+    .win-card { position: relative; }
+    .win-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel) 82%, transparent);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+    }
+    body.theme-plain .metrics,
+    body.theme-plain .top-stats { background: rgba(12,17,27,0.66); }
+    body.theme-cyberpunk .metrics { box-shadow: 0 0 18px rgba(0,245,255,0.14), inset 0 0 18px rgba(255,43,214,0.05); }
+    body.theme-vaporwave .metrics { border: 3px solid #fff; border-radius: 999px; box-shadow: 5px 5px 0 rgba(1,205,254,0.35); }
+    body.theme-medieval .metrics { border: 3px ridge #91612d; border-radius: 10px; background: #402512; }
+    body.theme-8bit .metrics { border-radius: 0; box-shadow: 4px 4px 0 #3a3a3a; }
+
+    /* Retro CRT shell inspired by the uploaded Vapor-Moo CRT treatment: scanlines, RGB mask, vignette, flicker. */
+    body.theme-8bit { overflow-x: hidden; }
+    body.theme-8bit .app {
+      position: relative;
+      isolation: isolate;
+      filter: contrast(1.12) saturate(1.18);
+    }
+    body.theme-8bit::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      background:
+        radial-gradient(ellipse at center, transparent 52%, rgba(0,0,0,0.34) 82%, rgba(0,0,0,0.72) 100%),
+        linear-gradient(rgba(255,255,255,0.075) 50%, rgba(0,0,0,0.24) 50%);
+      background-size: 100% 100%, 100% 4px;
+      mix-blend-mode: multiply;
+      opacity: .86;
+    }
+    body.theme-8bit::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      background:
+        linear-gradient(90deg, rgba(255,0,0,0.08), rgba(0,255,80,0.035), rgba(0,80,255,0.08)),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 3px);
+      background-size: 6px 100%, 100% 3px;
+      mix-blend-mode: screen;
+      opacity: .48;
+      animation: crtFlicker 2.8s infinite steps(8, end);
+    }
+    body.theme-8bit .board-shell {
+      border: 10px solid #202020;
+      outline: 4px solid #f8f8f8;
+      background: radial-gradient(circle at 50% 15%, #222, #050505 65%);
+      box-shadow: inset 0 0 0 4px #050505, 0 0 38px rgba(0,255,102,.18);
+    }
+    body.theme-8bit .canvas-wrap {
+      border-radius: 22px !important;
+      overflow: hidden;
+      box-shadow: inset 0 0 45px rgba(0,255,102,0.16), inset 0 0 80px rgba(0,0,0,0.72);
+    }
+    @keyframes crtFlicker {
+      0%, 100% { opacity: .46; transform: translateY(0); }
+      50% { opacity: .54; transform: translateY(.6px); }
+      78% { opacity: .42; }
+    }
+    @media (max-width: 620px) {
+      header { grid-template-columns: 1fr auto; }
+      .top-stats { grid-column: 1 / -1; justify-self: stretch; justify-content: center; }
+      .actions { grid-template-columns: repeat(5, 1fr); }
+      .actions .primary { grid-column: auto; }
+      .button { font-size: 10px; padding-inline: 4px; }
+    }
+    @media (max-width: 430px) {
+      .metric-label { display: none; }
+      .metric { padding-block: 7px; }
+      .actions { grid-template-columns: repeat(3, 1fr); }
+      .actions .primary { grid-column: span 2; }
+    }
+
+  </style>
 </head>
-<body class="theme-3d">
-    <div class="crt-overlay"></div>
-
+<body class="theme-plain">
+  <div class="app">
     <header>
+      <div class="brand">
         <h1>Flow Forge</h1>
-        <div class="stats-bar">
-            <div>⏱ <span id="timer-display">0:00</span></div>
-            <div>🔄 <span id="moves-display">0</span></div>
-        </div>
-        <div class="header-controls">
-            <button class="install-btn" id="btn-install">Install</button>
-            <button class="icon-btn" id="btn-settings" title="Settings">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
-            </button>
-        </div>
+        <div class="subtitle" id="level-subtitle">Clean render · smarter input · stronger levels</div>
+      </div>
+      <div class="top-stats" aria-label="Game statistics">
+        <div class="stat-pill" title="Timer">⏱ <span id="timer-display">0:00</span></div>
+        <div class="stat-pill" title="Moves">↯ <span id="moves-display">0</span></div>
+        <div class="stat-pill" title="Hints">💡 <span id="hints-display">0</span></div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-button" id="settings-button" type="button" aria-label="Open settings">
+          <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z" />
+            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.05.05a2.05 2.05 0 1 1-2.9 2.9l-.05-.05A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.05a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.88.34l-.05.05a2.05 2.05 0 1 1-2.9-2.9l.05-.05A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.05A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.05-.05a2.05 2.05 0 1 1 2.9-2.9l.05.05A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.05a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.88-.34l.05-.05a2.05 2.05 0 1 1 2.9 2.9l-.05.05A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.05A1.7 1.7 0 0 0 19.4 15Z" />
+          </svg>
+        </button>
+      </div>
     </header>
 
-    <div class="container">
-        <div class="metrics">
-            <div class="metric-item">
-                <span class="metric-label">Connected</span>
-                <span class="metric-value" id="metric-pipes">0/0</span>
-            </div>
-            <div class="metric-item">
-                <span class="metric-label">Grid Filled</span>
-                <span class="metric-value" id="metric-coverage">0%</span>
-            </div>
-            <div class="metric-item">
-                <span class="metric-label">High Score</span>
-                <span class="metric-value" id="metric-highscore">0</span>
-            </div>
+    <main class="main">
+      <section class="metrics" aria-label="Progress metrics">
+        <div class="metric">
+          <span class="metric-label">Connected</span>
+          <span class="metric-value" id="metric-connected">0/0</span>
         </div>
+        <div class="metric">
+          <span class="metric-label">Filled</span>
+          <span class="metric-value" id="metric-filled">0%</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Best</span>
+          <span class="metric-value" id="metric-best">0</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Undos</span>
+          <span class="metric-value" id="metric-undos">0</span>
+        </div>
+      </section>
 
-        <div class="canvas-container">
-            <canvas id="gameCanvas"></canvas>
-            <div class="win-overlay" id="win-overlay">
-                <h2>Level Cleared</h2>
-                <div class="win-score" id="win-score-display">Score: 0</div>
-                <div class="high-score-stamp" id="new-highscore-stamp" style="display:none;">★ NEW HIGH SCORE ★</div>
-                <button class="action primary" id="btn-next" style="width: 200px; max-width: 90%;">Next Level</button>
+      <section class="board-shell">
+        <div class="canvas-wrap" id="canvas-wrap">
+          <canvas id="game-canvas" aria-label="Flow puzzle grid"></canvas>
+          <div class="win-overlay" id="win-overlay">
+            <div class="win-card">
+              <button class="win-close" id="close-win-button" type="button" aria-label="Close win screen">×</button>
+              <h2>Cleared</h2>
+              <p id="score-label">Final score</p>
+              <div class="score-big" id="final-score">0</div>
+              <div class="new-best" id="new-best">★ New Best ★</div>
+              <button class="button primary" id="next-button" type="button">Next Level</button>
             </div>
+          </div>
         </div>
+        <div class="status-strip">
+          <span id="status-text"><strong>Ready.</strong> Draw from matching endpoints.</span>
+          <span id="generator-label">Original Forge</span>
+        </div>
+      </section>
 
-        <div class="action-buttons">
-            <button class="action disabled" id="btn-undo" title="Undo">UNDO</button>
-            <button class="action" id="btn-hint">Hint</button>
-            <button class="action" id="btn-reset">Reset</button>
-            <button class="action primary" id="btn-new">New</button>
+      <section class="actions" aria-label="Game actions">
+        <button class="button" id="undo-button" type="button" disabled>Undo</button>
+        <button class="button" id="hint-button" type="button">Hint</button>
+        <button class="button" id="reset-button" type="button">Reset</button>
+        <button class="button primary" id="new-button" type="button">New Level</button>
+        <button class="button" id="clear-button" type="button">Clear</button>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="settings-title">Settings</h2>
+        <button class="icon-button" id="close-settings-button" type="button" aria-label="Close settings">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="control">
+          <label for="theme-select">Theme</label>
+          <select id="theme-select"></select>
         </div>
+        <div class="control">
+          <label for="palette-select">Palette</label>
+          <select id="palette-select"></select>
+        </div>
+        <div class="control">
+          <label for="look-select">Line & Point Look</label>
+          <select id="look-select"></select>
+          <small>Each theme has its own pipe, endpoint, and grid treatment.</small>
+        </div>
+        <div class="control">
+          <label for="grid-size-select">Grid Size</label>
+          <select id="grid-size-select">
+            <option value="5">5 × 5</option>
+            <option value="6">6 × 6</option>
+            <option value="7">7 × 7</option>
+            <option value="8">8 × 8</option>
+            <option value="9">9 × 9</option>
+            <option value="10">10 × 10</option>
+            <option value="11">11 × 11</option>
+            <option value="12">12 × 12</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="difficulty-select">Difficulty</label>
+          <select id="difficulty-select">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+          <small>Easy uses more endpoint pairs and shorter routes, especially on large boards; Medium adds ambiguity; Hard favors longer, twistier routes.</small>
+        </div>
+        <div class="control">
+          <label for="generator-select">Level Generator</label>
+          <select id="generator-select">
+            <option value="fast">Original Forge — restored</option>
+            <option value="aesthetic">Aesthetic Forge — scored alternate</option>
+          </select>
+          <small>Original Forge uses the restored induced-path merge generator. Aesthetic Forge runs that same no-double-back generator many times, then picks a candidate using difficulty-specific scoring.</small>
+        </div>
+        <div class="control">
+          <label for="breaks-select">Line Breaks</label>
+          <select id="breaks-select">
+            <option value="false">Prevent other lines from breaking</option>
+            <option value="true">Allow drawn lines to cut others</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="input-assist-range">Input Assist</label>
+          <div class="range-row">
+            <input id="input-assist-range" type="range" min="0" max="100" step="5" value="75">
+            <span class="range-value" id="input-assist-value">75%</span>
+          </div>
+          <small>Higher values forgive fast or sloppy swipes with short local detours. It still will not search the whole board.</small>
+        </div>
+        <div class="modal-actions">
+          <button class="button" id="cancel-settings-button" type="button">Cancel</button>
+          <button class="button primary" id="apply-settings-button" type="button">Apply</button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="modal-overlay" id="settings-modal">
-        <div class="modal-content">
-            <div class="modal-header">Configuration</div>
-            <div class="control-group">
-                <label>Theme</label>
-                <select id="theme-select">
-                    <option value="theme-3d" selected>3D Glass & Chrome</option>
-                    <option value="theme-medieval">Medieval Tavern</option>
-                    <option value="theme-cyberpunk">Cyberpunk Neon</option>
-                    <option value="theme-vaporwave">Vaporwave Checkers</option>
-                    <option value="theme-retro">8-Bit Arcade</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label>Palette</label>
-                <select id="palette-select"></select>
-            </div>
-            <div class="control-group">
-                <label>Grid Size</label>
-                <select id="grid-size">
-                    <option value="5">5 x 5</option><option value="6">6 x 6</option>
-                    <option value="7">7 x 7</option><option value="8" selected>8 x 8</option>
-                    <option value="9">9 x 9</option><option value="10">10 x 10</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label>Difficulty</label>
-                <select id="difficulty">
-                    <option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label>Line Breaks</label>
-                <select id="allow-break"><option value="true">Allowed</option><option value="false" selected>Prevent</option></select>
-            </div>
-            <button class="btn-full" id="btn-close-settings">Apply Changes</button>
-        </div>
-    </div>
+  <script>
+    (() => {
+      'use strict';
 
-    <script>
-        /* =========================================
-           THEMES & PALETTES
-           ========================================= */
-        const Themes = {
-            'theme-3d': {
-                palettes: {
-                    'Standard Gloss': ['#FF3B30', '#34C759', '#007AFF', '#FF9500', '#AF52DE', '#FF2D55', '#FFCC00', '#30B0C7', '#8E8E93', '#A2845E'],
-                    'Pastel Glass': ['#FF9AA2', '#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#F1CBFF', '#A0E4CB', '#C4D7E0', '#FFF1CC']
-                }
-            },
-            'theme-medieval': {
-                palettes: {
-                    'Dyed Wool': ['#d32f2f', '#1976d2', '#388e3c', '#fbc02d', '#7b1fa2', '#f57c00', '#00796b', '#c2185b', '#5d4037', '#689f38'],
-                    'Earthy Tones': ['#3e2723', '#4e342e', '#5d4037', '#795548', '#8d6e63', '#424242', '#616161', '#757575', '#827717', '#9e9d24']
-                }
-            },
-            'theme-cyberpunk': {
-                palettes: {
-                    'Night City': ['#00ffff', '#ff00ff', '#00ff00', '#ffff00', '#ff3300', '#3333ff', '#ff0033', '#00ffcc', '#cc00ff', '#ffffff'],
-                    'Netrunner': ['#ff2a2a', '#2a2aff', '#ffff2a', '#ff8800', '#00ff88', '#8800ff', '#ff0088', '#0088ff', '#88ff00', '#ff2a88']
-                }
-            },
-            'theme-vaporwave': {
-                palettes: {
-                    'Miami Sunset': ['#ff71ce', '#01cdfe', '#05ffa1', '#b967ff', '#fffb96', '#ff9472', '#41f2ff', '#e07a5f', '#f4a261', '#e9c46a'],
-                    'A E S T H E T I C': ['#ffb3ba', '#ffdfba', '#ffffba', '#baffc9', '#bae1ff', '#e8baff', '#ffbaff', '#baffeb', '#e1ffba', '#ffbacb']
-                }
-            },
-            'theme-retro': {
-                palettes: {
-                    'Arcade CRT': ['#ff0000', '#00ff00', '#0044ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', '#ff8800', '#ff0088', '#00ff88'],
-                    // Replaced broken GameBoy with 10 highly distinct retro green shades to prevent logic merging
-                    'GameBoy DMG (Fixed)': ['#053800', '#0f5900', '#187a00', '#229b00', '#2cbc00', '#41d10e', '#57e826', '#72ff42', '#96ff73', '#baff9e']
-                }
+      const $ = (id) => document.getElementById(id);
+      const canvas = $('game-canvas');
+      const ctx = canvas.getContext('2d', { alpha: true });
+      const wrap = $('canvas-wrap');
+
+      const ThemeCatalog = {
+        'theme-plain': {
+          label: 'Plain Dark',
+          looks: { classic: 'Clean Tubes', variant1: 'Blueprint Rails', variant2: 'Hard-Edge Blocks' },
+          palettes: {
+            'Clear Contrast': ['#ef4444', '#16a34a', '#2563eb', '#f59e0b', '#9333ea', '#db2777', '#ca8a04', '#0891b2', '#64748b', '#ea580c', '#14b8a6', '#e11d48', '#84cc16', '#7c2d12'],
+            'Office Highlighter': ['#dc2626', '#059669', '#1d4ed8', '#d97706', '#7c3aed', '#be185d', '#65a30d', '#0e7490', '#475569', '#c2410c', '#0d9488', '#f43f5e', '#a3e635', '#78350f']
+          }
+        },
+        'theme-3d': {
+          label: '3D',
+          looks: { classic: 'Glossy Glass', variant1: 'Chrome Spine', variant2: 'Faceted Gel' },
+          palettes: {
+            'Polished Gems': ['#ff3b30', '#34c759', '#007aff', '#ff9500', '#af52de', '#ff2d55', '#ffcc00', '#30b0c7', '#8e8e93', '#a2845e', '#64d2ff', '#bf5af2', '#ffd60a', '#ff9f0a'],
+            'Candy Chrome': ['#ff5e7e', '#38e08b', '#4aa3ff', '#ffb02e', '#b96cff', '#ff62ce', '#ffe156', '#27d6d6', '#aab2c3', '#ff8856', '#7ee7ff', '#d98cff', '#e7ff60', '#ff6b35']
+          }
+        },
+        'theme-cyberpunk': {
+          label: 'Cyberpunk',
+          looks: { classic: 'Neon Core', variant1: 'Laser Lattice', variant2: 'Square Circuit Bus' },
+          palettes: {
+            'Night City': ['#00f5ff', '#ff2bd6', '#39ff14', '#ffee32', '#ff4d00', '#7b61ff', '#ff006e', '#00ffb7', '#ffffff', '#ff7aef', '#00a2ff', '#b6ff00', '#ffb000', '#bd00ff'],
+            'Laser Lab': ['#ff1744', '#00e5ff', '#76ff03', '#ffea00', '#d500f9', '#2979ff', '#ff9100', '#00e676', '#f50057', '#e0f7fa', '#18ffff', '#c6ff00', '#ff3d00', '#aa00ff']
+          }
+        },
+        'theme-medieval': {
+          label: 'Medieval',
+          looks: { classic: 'Braided Cord', variant1: 'Iron-Riveted Chain', variant2: 'Heraldic Banner' },
+          palettes: {
+            'Dyed Cord': ['#d62828', '#2a9d8f', '#3a86ff', '#fcbf49', '#9d4edd', '#f77f00', '#007f5f', '#c9184a', '#90be6d', '#f4a261', '#8ecae6', '#bc6c25', '#606c38', '#e9c46a'],
+            'Royal Banners': ['#b31312', '#0a9396', '#005f73', '#ee9b00', '#7209b7', '#ca6702', '#386641', '#ae2012', '#6f1d1b', '#94d2bd', '#9b5de5', '#bb3e03', '#a7c957', '#e9d8a6']
+          }
+        },
+        'theme-vaporwave': {
+          label: 'Vaporwave',
+          looks: { classic: 'Bubble Tubes', variant1: 'Glass Neon Straws', variant2: 'Hard Sticker Strips' },
+          palettes: {
+            'Miami Sunset': ['#ff71ce', '#01cdfe', '#05ffa1', '#b967ff', '#fffb96', '#ff9472', '#41f2ff', '#e07a5f', '#f4a261', '#e9c46a', '#7b2ff7', '#f72585', '#4cc9f0', '#bde0fe'],
+            'Pool Mall': ['#ff9de2', '#59d2fe', '#73ffbf', '#b892ff', '#fff49e', '#ffb07c', '#7df9ff', '#e76f98', '#ffd166', '#cdb4db', '#a0c4ff', '#ffc6ff', '#9bf6ff', '#fdffb6']
+          }
+        },
+        'theme-8bit': {
+          label: '8-Bit Arcade',
+          looks: { classic: 'Pixel Pipes', variant1: 'Chunky Sprite Tiles', variant2: 'CRT Beam Blocks' },
+          palettes: {
+            'Arcade CRT': ['#ff3131', '#39ff14', '#1f75ff', '#fff200', '#ff00ff', '#00ffff', '#ffffff', '#ff8c00', '#ff1493', '#00ff88', '#ffea00', '#00a8ff', '#ff5f1f', '#bfff00'],
+            'Game Cart': ['#9bbc0f', '#306230', '#0f380f', '#8bac0f', '#e0f8d0', '#ffcc00', '#ff006e', '#3a86ff', '#fb5607', '#8338ec', '#06d6a0', '#118ab2', '#ef476f', '#ffd166']
+          }
+        }
+      };
+
+      const state = {
+        settings: {
+          theme: 'theme-plain',
+          paletteName: 'Clear Contrast',
+          look: 'classic',
+          size: 8,
+          difficulty: 'medium',
+          generator: 'fast',
+          allowBreaks: false,
+          inputAssist: 75
+        },
+        level: null,
+        playerPaths: {},
+        completed: {},
+        undoStack: [],
+        drawing: false,
+        activePipeId: null,
+        activePointerId: null,
+        moveTrackedThisStroke: false,
+        timerStarted: false,
+        timerStartMs: 0,
+        elapsedBeforePause: 0,
+        timerHandle: null,
+        gameWon: false,
+        animating: false,
+        stats: { moves: 0, hints: 0, undos: 0, resets: 0 },
+        cssSize: 0,
+        cellSize: 0,
+        dpr: Math.max(1, window.devicePixelRatio || 1),
+        resizeQueued: false,
+        lastScore: 0,
+        lastPointerCell: null
+      };
+
+      function currentPalette() {
+        const theme = ThemeCatalog[state.settings.theme] || ThemeCatalog['theme-plain'];
+        return theme.palettes[state.settings.paletteName] || theme.palettes[Object.keys(theme.palettes)[0]];
+      }
+
+      function currentLooks(themeValue = state.settings.theme) {
+        const theme = ThemeCatalog[themeValue] || ThemeCatalog['theme-plain'];
+        return theme.looks || { classic: 'Default' };
+      }
+
+      function firstLook(themeValue = state.settings.theme) {
+        return Object.keys(currentLooks(themeValue))[0] || 'classic';
+      }
+
+      function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+      function keyOf(p) { return `${p.x},${p.y}`; }
+      function sameCell(a, b) { return a && b && a.x === b.x && a.y === b.y; }
+      function adjacent(a, b) { return Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1; }
+      function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
+      function randInt(max) { return Math.floor(Math.random() * max); }
+      function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = randInt(i + 1);
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      const DifficultyProfiles = {
+        easy: {
+          label: 'Easy',
+          // Easy intentionally has more endpoints. In Flow-style puzzles, a few long
+          // pipes are often harder because the player has fewer anchors and much more
+          // empty space to reason about. More pipes make the board self-constraining.
+          pipeFactor: 1.15,
+          minPipes: 4,
+          maxPipes: 14,
+          attempts: 5,
+          targetTurnRatio: 0.24,
+          turnPenalty: 900,
+          endpointWeight: -16,
+          edgeBiasWeight: 5,
+          stdPenalty: 58,
+          minLengthTarget: 3,
+          shortPenalty: 360,
+          longRatio: 1.75,
+          longPenalty: 34,
+          straightRunLimit: 4,
+          straightPenalty: 18,
+          parallelPenalty: 4
+        },
+        medium: {
+          label: 'Medium',
+          // Medium is a touch harder than before: fewer pipes than the old setting,
+          // but not so few that it becomes a giant ambiguous maze.
+          pipeFactor: 0.76,
+          minPipes: 4,
+          maxPipes: 12,
+          attempts: 6,
+          targetTurnRatio: 0.38,
+          turnPenalty: 1120,
+          endpointWeight: 8,
+          edgeBiasWeight: -7,
+          stdPenalty: 40,
+          minLengthTarget: 4,
+          shortPenalty: 470,
+          longRatio: 2.18,
+          longPenalty: 26,
+          straightRunLimit: 3,
+          straightPenalty: 42,
+          parallelPenalty: 9
+        },
+        hard: {
+          label: 'Hard',
+          // Hard earns its name by reducing anchors and preferring longer, twistier,
+          // less evenly distributed paths while still obeying the no-double-back rule.
+          pipeFactor: 0.60,
+          minPipes: 3,
+          maxPipes: 10,
+          attempts: 7,
+          targetTurnRatio: 0.48,
+          turnPenalty: 1320,
+          endpointWeight: 20,
+          edgeBiasWeight: -12,
+          stdPenalty: 22,
+          minLengthTarget: 5,
+          shortPenalty: 560,
+          longRatio: 2.65,
+          longPenalty: 12,
+          straightRunLimit: 3,
+          straightPenalty: 56,
+          parallelPenalty: 14
+        }
+      };
+
+      function difficultyProfile(difficulty) {
+        return DifficultyProfiles[difficulty] || DifficultyProfiles.medium;
+      }
+
+      function pipeCountFor(size, difficulty) {
+        const profile = difficultyProfile(difficulty);
+        return clamp(Math.round(size * profile.pipeFactor), profile.minPipes, profile.maxPipes);
+      }
+
+      class PathCoverGenerator {
+        constructor(width, height, count, palette, mode, difficulty = 'medium') {
+          this.W = width;
+          this.H = height;
+          this.count = count;
+          this.palette = palette;
+          this.mode = mode === 'aesthetic' ? 'aesthetic' : 'legacy';
+          this.difficulty = difficulty;
+          this.profile = difficultyProfile(difficulty);
+        }
+
+        generate() {
+          // IMPORTANT: both modes are based on the original path-cover/merge generator.
+          // The earlier rewrite broke the key invariant by allowing a path to contain
+          // orthogonally adjacent cells that were not actually connected by the pipe.
+          // That creates visual "doubling back" / hairpin shapes. The original algorithm's
+          // induced-path validation is restored below and is now a hard rule.
+          const attempts = this.mode === 'aesthetic' ? this.profile.attempts : Math.max(2, Math.floor(this.profile.attempts / 8));
+          let best = null;
+          let bestScore = -Infinity;
+
+          for (let i = 0; i < attempts; i++) {
+            const candidate = this.generateOriginalCandidate();
+            if (!candidate) continue;
+            if (!this.isNoDoubleBackCandidate(candidate.sequences)) continue;
+
+            const score = this.mode === 'aesthetic'
+              ? this.scoreCandidate(candidate.sequences)
+              : this.legacyScore(candidate.sequences, candidate.coverage);
+
+            if (score > bestScore) {
+              bestScore = score;
+              best = candidate;
+              if (this.mode === 'legacy' && candidate.coverage === this.W * this.H && score > this.W * this.H * 100) {
+                // Fast path: the original generator is already excellent. Stop once
+                // we find a full, induced, no-double-back board with decent lengths.
+                break;
+              }
             }
+          }
+
+          // The original generator is extremely reliable on the supported grid sizes.
+          // Still, avoid falling back to a Hamiltonian snake because those are exactly
+          // the patterns Patrick was trying to avoid.
+          if (!best) {
+            for (let i = 0; i < 300 && !best; i++) {
+              const candidate = this.generateOriginalCandidate();
+              if (candidate && this.isNoDoubleBackCandidate(candidate.sequences)) { best = candidate; bestScore = this.legacyScore(candidate.sequences, candidate.coverage); }
+            }
+          }
+
+          if (!best) {
+            throw new Error('Unable to generate a no-double-back level. Try a different grid size or difficulty.');
+          }
+
+          return this.toLevel(best.sequences, Math.round(bestScore));
+        }
+
+        makeGrid() {
+          const grid = [];
+          const paths = new Map();
+          let idCtr = 0;
+          for (let y = 0; y < this.H; y++) {
+            grid[y] = [];
+            for (let x = 0; x < this.W; x++) {
+              const cell = { x, y, id: idCtr++, edges: [] };
+              grid[y][x] = cell;
+              paths.set(cell.id, [cell]);
+            }
+          }
+          return { grid, paths, idCtr };
+        }
+
+        neighbors(grid, cell) {
+          const n = [];
+          if (cell.y > 0) n.push(grid[cell.y - 1][cell.x]);
+          if (cell.y < this.H - 1) n.push(grid[cell.y + 1][cell.x]);
+          if (cell.x > 0) n.push(grid[cell.y][cell.x - 1]);
+          if (cell.x < this.W - 1) n.push(grid[cell.y][cell.x + 1]);
+          return n;
+        }
+
+        // This is the restored original invariant. A valid solution path is not merely
+        // a simple graph path; it must be an induced grid path. In plain English: if two
+        // cells in the same pipe are side-by-side, the pipe must actually connect them.
+        // That single rule prevents U-shape/hairpin/double-back artifacts.
+        validInducedPath(cells, grid) {
+          if (!cells.length) return false;
+          if (cells.length === 1) return true;
+
+          const cellSet = new Set(cells);
+          let totalEdges = 0;
+          let endpoints = 0;
+
+          for (const c of cells) {
+            if (c.edges.length > 2) return false;
+            if (c.edges.some(e => !cellSet.has(e))) return false;
+
+            totalEdges += c.edges.length;
+            if (c.edges.length === 1) endpoints++;
+
+            let gridNeighborsInPath = 0;
+            for (const n of this.neighbors(grid, c)) {
+              if (cellSet.has(n)) gridNeighborsInPath++;
+            }
+            if (gridNeighborsInPath !== c.edges.length) return false;
+          }
+
+          return endpoints === 2 && totalEdges / 2 === cells.length - 1;
+        }
+
+        splitPath(startCell, ignoreEdgeTo = null) {
+          const visited = [];
+          const q = [startCell];
+          const visitedSet = new Set([startCell]);
+
+          while (q.length > 0) {
+            const curr = q.shift();
+            visited.push(curr);
+            for (const next of curr.edges) {
+              if (curr === startCell && next === ignoreEdgeTo) continue;
+              if (!visitedSet.has(next)) {
+                visitedSet.add(next);
+                q.push(next);
+              }
+            }
+          }
+          return visited;
+        }
+
+        generateOriginalCandidate() {
+          let bestBoard = null;
+          let bestCoverage = 0;
+          let bestLengthSpread = Infinity;
+
+          for (let attempt = 0; attempt < 30; attempt++) {
+            const made = this.makeGrid();
+            const grid = made.grid;
+            const paths = made.paths;
+            let pathIdCtr = made.idCtr;
+
+            let iters = 0;
+            while (iters++ < 15000) {
+              if (paths.size <= this.count) {
+                let allGood = true;
+                for (const p of paths.values()) {
+                  if (p.length < 3) allGood = false;
+                }
+                if (allGood) break;
+              }
+
+              const endpoints = [];
+              for (const p of paths.values()) {
+                for (const c of p) if (c.edges.length <= 1) endpoints.push(c);
+              }
+              if (endpoints.length === 0) break;
+
+              const C = endpoints[randInt(endpoints.length)];
+              const neighborPool = this.neighbors(grid, C).filter(n => !C.edges.includes(n));
+              if (neighborPool.length === 0) continue;
+              const N = neighborPool[randInt(neighborPool.length)];
+
+              if (N.edges.length <= 1) {
+                if (C.id === N.id) continue;
+
+                const pathC = paths.get(C.id);
+                const pathN = paths.get(N.id);
+                if (!pathC || !pathN) continue;
+
+                C.edges.push(N);
+                N.edges.push(C);
+                const newCells = pathC.concat(pathN);
+
+                if (this.validInducedPath(newCells, grid)) {
+                  const newId = pathIdCtr++;
+                  const oldCid = C.id;
+                  const oldNid = N.id;
+                  for (const cell of newCells) cell.id = newId;
+                  paths.delete(oldCid);
+                  paths.delete(oldNid);
+                  paths.set(newId, newCells);
+                } else {
+                  C.edges.pop();
+                  N.edges.pop();
+                }
+              } else {
+                if (paths.size > this.count && Math.random() > 0.6) continue;
+
+                const N2 = N.edges[randInt(N.edges.length)];
+                const idxN = N.edges.indexOf(N2);
+                const idxN2 = N2.edges.indexOf(N);
+                if (idxN < 0 || idxN2 < 0) continue;
+
+                C.edges.push(N);
+                N.edges[idxN] = C;
+                N2.edges.splice(idxN2, 1);
+
+                const newPath1 = this.splitPath(C, null);
+                if (this.validInducedPath(newPath1, grid)) {
+                  const newPath2 = this.splitPath(N2, null);
+                  if (this.validInducedPath(newPath2, grid)) {
+                    const oldCid = C.id;
+                    const oldNid = N.id;
+                    paths.delete(oldCid);
+                    if (paths.has(oldNid)) paths.delete(oldNid);
+
+                    const newId1 = pathIdCtr++;
+                    for (const cell of newPath1) cell.id = newId1;
+                    paths.set(newId1, newPath1);
+
+                    const newId2 = pathIdCtr++;
+                    for (const cell of newPath2) cell.id = newId2;
+                    paths.set(newId2, newPath2);
+                  } else {
+                    C.edges.pop();
+                    N.edges[idxN] = N2;
+                    N2.edges.push(N);
+                  }
+                } else {
+                  C.edges.pop();
+                  N.edges[idxN] = N2;
+                  N2.edges.push(N);
+                }
+              }
+            }
+
+            const topPaths = Array.from(paths.values()).sort((a, b) => b.length - a.length).slice(0, this.count);
+            if (topPaths.length !== this.count) continue;
+            if (topPaths.some(p => p.length < 2)) continue;
+
+            const sequences = topPaths.map(p => this.sequenceFromCells(p)).filter(Boolean);
+            if (sequences.length !== this.count) continue;
+            if (!this.isNoDoubleBackCandidate(sequences)) continue;
+
+            const coverage = this.coverageOf(sequences);
+            const lengths = sequences.map(s => s.length);
+            const spread = Math.max(...lengths) - Math.min(...lengths);
+
+            if (coverage > bestCoverage || (coverage === bestCoverage && spread < bestLengthSpread)) {
+              bestCoverage = coverage;
+              bestLengthSpread = spread;
+              bestBoard = sequences;
+              if (coverage === this.W * this.H && spread <= Math.ceil((this.W * this.H) / this.count)) break;
+            }
+          }
+
+          if (!bestBoard) return null;
+          return { sequences: bestBoard, coverage: bestCoverage };
+        }
+
+        sequenceFromCells(cells) {
+          const endpoints = cells.filter(c => c.edges.length <= 1);
+          if (endpoints.length !== 2) return null;
+
+          const seq = [];
+          let curr = endpoints[0];
+          let prev = null;
+          const seen = new Set();
+
+          while (curr) {
+            seq.push({ x: curr.x, y: curr.y });
+            seen.add(curr);
+            const next = curr.edges.find(e => e !== prev);
+            prev = curr;
+            curr = next || null;
+            if (curr && seen.has(curr)) return null;
+          }
+          return seq.length === cells.length ? seq : null;
+        }
+
+        coverageOf(sequences) {
+          const cells = new Set();
+          for (const seq of sequences) for (const p of seq) cells.add(keyOf(p));
+          return cells.size;
+        }
+
+        isNoDoubleBackCandidate(sequences) {
+          const occupied = new Map();
+          for (const seq of sequences) {
+            if (this.doubleBackPenalty(seq) > 0) return false;
+            for (let i = 0; i < seq.length; i++) {
+              const k = keyOf(seq[i]);
+              if (occupied.has(k)) return false;
+              occupied.set(k, true);
+            }
+          }
+          return occupied.size === this.W * this.H;
+        }
+
+        doubleBackPenalty(seq) {
+          let penalty = 0;
+          const inSeq = new Set(seq.map(keyOf));
+
+          // Immediate U/hairpin: right, down, left / down, right, up / etc.
+          for (let i = 0; i < seq.length - 3; i++) {
+            const d1 = { x: seq[i + 1].x - seq[i].x, y: seq[i + 1].y - seq[i].y };
+            const d2 = { x: seq[i + 2].x - seq[i + 1].x, y: seq[i + 2].y - seq[i + 1].y };
+            const d3 = { x: seq[i + 3].x - seq[i + 2].x, y: seq[i + 3].y - seq[i + 2].y };
+            if ((d2.x !== 0 || d2.y !== 0) && d1.x === -d3.x && d1.y === -d3.y) penalty += 100;
+          }
+
+          // Induced-path check at sequence level: no same-pipe cells may sit orthogonally
+          // adjacent unless they are consecutive in the sequence.
+          for (let i = 0; i < seq.length; i++) {
+            const p = seq[i];
+            const around = [
+              { x: p.x + 1, y: p.y }, { x: p.x - 1, y: p.y },
+              { x: p.x, y: p.y + 1 }, { x: p.x, y: p.y - 1 }
+            ];
+            for (const n of around) {
+              if (!inSeq.has(keyOf(n))) continue;
+              const prev = seq[i - 1];
+              const next = seq[i + 1];
+              if (!sameCell(n, prev) && !sameCell(n, next)) penalty += 100;
+            }
+          }
+
+          return penalty;
+        }
+
+        legacyScore(sequences, coverage) {
+          // Original Forge still uses the restored merge/reroute generator, but its
+          // candidate choice now respects the same difficulty personality as the
+          // scored generator. That keeps the old no-double-back feel while making
+          // Easy genuinely easier and Medium/Hard more intentional.
+          return coverage * 100 + this.difficultyFitness(sequences) * 0.36 + Math.random() * 12;
+        }
+
+        countTurns(seq) {
+          let turns = 0;
+          let prev = null;
+          for (let i = 1; i < seq.length; i++) {
+            const dir = { x: seq[i].x - seq[i - 1].x, y: seq[i].y - seq[i - 1].y };
+            if (prev && (dir.x !== prev.x || dir.y !== prev.y)) turns++;
+            prev = dir;
+          }
+          return turns;
+        }
+
+        analyzeSequences(sequences) {
+          const total = this.W * this.H;
+          const lengths = sequences.map(s => s.length);
+          const mean = total / sequences.length;
+          const minLen = Math.min(...lengths);
+          const maxLen = Math.max(...lengths);
+          const variance = lengths.reduce((sum, l) => sum + Math.pow(l - mean, 2), 0) / lengths.length;
+          const std = Math.sqrt(variance);
+
+          let turns = 0;
+          let straightRunsPenalty = 0;
+          let endpointDistance = 0;
+          let endpointEdgeBias = 0;
+          const segments = [];
+          const profile = this.profile;
+
+          for (const seq of sequences) {
+            endpointDistance += Math.abs(seq[0].x - seq[seq.length - 1].x) + Math.abs(seq[0].y - seq[seq.length - 1].y);
+            const ends = [seq[0], seq[seq.length - 1]];
+            for (const e of ends) {
+              if (e.x === 0 || e.x === this.W - 1 || e.y === 0 || e.y === this.H - 1) endpointEdgeBias++;
+            }
+
+            let run = 1;
+            let prevDir = null;
+            for (let i = 1; i < seq.length; i++) {
+              const dir = { x: seq[i].x - seq[i - 1].x, y: seq[i].y - seq[i - 1].y };
+              segments.push({ a: seq[i - 1], b: seq[i], dir });
+              if (prevDir) {
+                if (dir.x !== prevDir.x || dir.y !== prevDir.y) {
+                  turns++;
+                  run = 1;
+                } else {
+                  run++;
+                  if (run > profile.straightRunLimit) straightRunsPenalty += run - profile.straightRunLimit;
+                }
+              }
+              prevDir = dir;
+            }
+          }
+
+          let parallelPenalty = 0;
+          for (let i = 0; i < segments.length; i++) {
+            for (let j = i + 1; j < segments.length; j++) {
+              const s1 = segments[i], s2 = segments[j];
+              const sameAxis = Math.abs(s1.dir.x) === Math.abs(s2.dir.x) && Math.abs(s1.dir.y) === Math.abs(s2.dir.y);
+              if (!sameAxis) continue;
+              if (s1.dir.x !== 0) {
+                const yApart = Math.abs(s1.a.y - s2.a.y);
+                const overlap = Math.max(Math.min(s1.a.x, s1.b.x), Math.min(s2.a.x, s2.b.x)) <= Math.min(Math.max(s1.a.x, s1.b.x), Math.max(s2.a.x, s2.b.x));
+                if (yApart === 1 && overlap) parallelPenalty++;
+              } else {
+                const xApart = Math.abs(s1.a.x - s2.a.x);
+                const overlap = Math.max(Math.min(s1.a.y, s1.b.y), Math.min(s2.a.y, s2.b.y)) <= Math.min(Math.max(s1.a.y, s1.b.y), Math.max(s2.a.y, s2.b.y));
+                if (xApart === 1 && overlap) parallelPenalty++;
+              }
+            }
+          }
+
+          return { total, lengths, mean, minLen, maxLen, std, turns, straightRunsPenalty, endpointDistance, endpointEdgeBias, parallelPenalty };
+        }
+
+        difficultyFitness(sequences) {
+          const m = this.analyzeSequences(sequences);
+          const p = this.profile;
+          const turnRatio = m.turns / Math.max(1, m.total - sequences.length);
+          const turnScore = 1000 - Math.abs(turnRatio - p.targetTurnRatio) * p.turnPenalty;
+
+          let score = 0;
+          score += turnScore;
+          score += m.endpointDistance * p.endpointWeight;
+          score += m.endpointEdgeBias * p.edgeBiasWeight;
+          score -= m.std * p.stdPenalty;
+          score -= Math.max(0, p.minLengthTarget - m.minLen) * p.shortPenalty;
+          score -= Math.max(0, m.maxLen - m.mean * p.longRatio) * p.longPenalty;
+          score -= m.straightRunsPenalty * p.straightPenalty;
+          score -= m.parallelPenalty * p.parallelPenalty;
+          return score;
+        }
+
+        scoreCandidate(sequences) {
+          let score = 6000;
+          score += this.difficultyFitness(sequences);
+          score += Math.random() * 35;
+          return score;
+        }
+
+        toLevel(sequences, quality) {
+          const palette = this.palette;
+          const ordered = shuffle(sequences.slice()).sort((a, b) => b.length - a.length + (Math.random() - 0.5));
+          return {
+            width: this.W,
+            height: this.H,
+            quality,
+            pipes: ordered.map((path, i) => ({
+              id: `pipe-${i + 1}`,
+              color: palette[i % palette.length],
+              path
+            }))
+          };
+        }
+      }
+
+      function cssVar(name) {
+        return getComputedStyle(document.body).getPropertyValue(name).trim();
+      }
+
+      function setTheme(theme) {
+        document.body.className = theme;
+        const accent = cssVar('--bg-2') || '#0d1018';
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', accent);
+      }
+
+      function scheduleResize() {
+        if (state.resizeQueued) return;
+        state.resizeQueued = true;
+        requestAnimationFrame(() => {
+          state.resizeQueued = false;
+          resizeCanvas();
+        });
+      }
+
+      function resizeCanvas() {
+        const rect = wrap.getBoundingClientRect();
+        const size = Math.max(120, Math.floor(Math.min(rect.width, rect.height || rect.width)));
+        state.dpr = Math.max(1, window.devicePixelRatio || 1);
+        state.cssSize = size;
+        state.cellSize = state.level ? size / state.level.width : 0;
+        const px = Math.floor(size * state.dpr);
+        if (canvas.width !== px || canvas.height !== px) {
+          canvas.width = px;
+          canvas.height = px;
+          canvas.style.width = `${size}px`;
+          canvas.style.height = `${size}px`;
+        }
+        ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+        drawBoard();
+      }
+
+      function drawRoundedRect(x, y, w, h, r) {
+        if (ctx.roundRect) {
+          ctx.roundRect(x, y, w, h, r);
+          return;
+        }
+        const rr = Math.min(r, w / 2, h / 2);
+        ctx.moveTo(x + rr, y);
+        ctx.arcTo(x + w, y, x + w, y + h, rr);
+        ctx.arcTo(x + w, y + h, x, y + h, rr);
+        ctx.arcTo(x, y + h, x, y, rr);
+        ctx.arcTo(x, y, x + w, y, rr);
+      }
+
+      function drawBoard() {
+        if (!state.level || !state.cssSize || !state.cellSize) return;
+        const size = state.cssSize;
+        const cell = state.cellSize;
+        const level = state.level;
+        const theme = state.settings.theme;
+        const isPlain = theme === 'theme-plain';
+        const is3D = theme === 'theme-3d';
+        const isCyber = theme === 'theme-cyberpunk';
+        const isMedieval = theme === 'theme-medieval';
+        const isVapor = theme === 'theme-vaporwave';
+        const is8Bit = theme === 'theme-8bit';
+        const look = state.settings.look || 'classic';
+
+        ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+        ctx.clearRect(0, 0, size, size);
+
+        function cellCenter(p) {
+          return { x: p.x * cell + cell / 2, y: p.y * cell + cell / 2 };
+        }
+
+        function makeGradient(x0, y0, x1, y1, a, b) {
+          const g = ctx.createLinearGradient(x0, y0, x1, y1);
+          g.addColorStop(0, a);
+          g.addColorStop(1, b);
+          return g;
+        }
+
+        function drawPolyline(path) {
+          ctx.beginPath();
+          for (let i = 0; i < path.length; i++) {
+            const pt = cellCenter(path[i]);
+            if (i === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+          }
+        }
+
+        function shadeColor(hex, pct) {
+          const clean = hex.replace('#', '');
+          if (clean.length !== 6) return hex;
+          const num = parseInt(clean, 16);
+          let r = (num >> 16) + pct;
+          let g = ((num >> 8) & 255) + pct;
+          let b = (num & 255) + pct;
+          r = clamp(r, 0, 255); g = clamp(g, 0, 255); b = clamp(b, 0, 255);
+          return `rgb(${r},${g},${b})`;
+        }
+
+        // Canvas background: every theme owns the whole board, not just the CSS shell.
+        if (is8Bit) {
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(0, 0, size, size);
+          ctx.fillStyle = 'rgba(255,255,255,0.035)';
+          for (let y = 0; y < size; y += Math.max(2, Math.floor(cell / 6))) ctx.fillRect(0, y, size, 1);
+        } else if (isVapor) {
+          const g = makeGradient(0, 0, size, size, '#fff0fb', '#bceeff');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, size, size);
+        } else if (isMedieval) {
+          ctx.fillStyle = '#5a351b';
+          ctx.fillRect(0, 0, size, size);
+          for (let i = 0; i < 18; i++) {
+            const y = (i / 18) * size;
+            ctx.fillStyle = i % 2 ? 'rgba(0,0,0,0.06)' : 'rgba(255,230,170,0.035)';
+            ctx.fillRect(0, y, size, size / 34);
+          }
+        } else if (isCyber) {
+          ctx.fillStyle = '#030511';
+          ctx.fillRect(0, 0, size, size);
+          const g = ctx.createRadialGradient(size * 0.25, size * 0.15, 0, size * 0.5, size * 0.5, size * 0.8);
+          g.addColorStop(0, 'rgba(0,245,255,0.12)');
+          g.addColorStop(0.45, 'rgba(255,43,214,0.06)');
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, size, size);
+        } else if (is3D) {
+          const g = makeGradient(0, 0, size, size, '#252a34', '#10131a');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, size, size);
+        } else {
+          ctx.fillStyle = cssVar('--canvas-bg') || '#fff';
+          ctx.fillRect(0, 0, size, size);
+        }
+
+        // Grid/tile systems.
+        for (let y = 0; y < level.height; y++) {
+          for (let x = 0; x < level.width; x++) {
+            const xx = x * cell, yy = y * cell;
+            if (is8Bit) {
+              ctx.fillStyle = (x + y) % 2 ? 'rgba(255,255,255,0.035)' : 'rgba(255,255,255,0.01)';
+              ctx.fillRect(xx, yy, cell, cell);
+              ctx.strokeStyle = 'rgba(255,255,255,0.24)';
+              ctx.lineWidth = Math.max(1, Math.floor(cell * 0.025));
+              ctx.strokeRect(Math.round(xx) + 0.5, Math.round(yy) + 0.5, Math.round(cell), Math.round(cell));
+              if (look === 'variant2') {
+                ctx.strokeStyle = 'rgba(255,242,0,0.22)';
+                ctx.beginPath(); ctx.moveTo(xx, yy + cell * 0.5); ctx.lineTo(xx + cell, yy + cell * 0.5); ctx.stroke();
+              }
+            } else if (isPlain) {
+              ctx.fillStyle = (x + y) % 2 ? 'rgba(15,23,42,0.016)' : 'rgba(15,23,42,0.006)';
+              ctx.fillRect(xx, yy, cell, cell);
+              ctx.strokeStyle = cssVar('--grid-line');
+              ctx.lineWidth = 1;
+              ctx.strokeRect(xx + 0.5, yy + 0.5, cell, cell);
+            } else if (is3D) {
+              const inset = Math.max(2, cell * 0.055);
+              ctx.beginPath();
+              drawRoundedRect(xx + inset, yy + inset, cell - inset * 2, cell - inset * 2, Math.max(6, cell * 0.14));
+              ctx.fillStyle = makeGradient(xx, yy, xx + cell, yy + cell, 'rgba(255,255,255,0.085)', 'rgba(0,0,0,0.12)');
+              ctx.fill();
+              ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+              ctx.lineWidth = 1;
+              ctx.stroke();
+              ctx.beginPath();
+              drawRoundedRect(xx + inset + 1, yy + inset + 1, cell - inset * 2 - 2, cell - inset * 2 - 2, Math.max(4, cell * 0.11));
+              ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+              ctx.stroke();
+            } else if (isCyber) {
+              const inset = Math.max(1, cell * 0.028);
+              ctx.fillStyle = (x + y) % 2 ? 'rgba(0,245,255,0.025)' : 'rgba(255,43,214,0.017)';
+              ctx.fillRect(xx + inset, yy + inset, cell - inset * 2, cell - inset * 2);
+              ctx.strokeStyle = 'rgba(0,245,255,0.18)';
+              ctx.lineWidth = 1;
+              ctx.strokeRect(xx + 0.5, yy + 0.5, cell, cell);
+              if ((x + y) % 3 === 0) {
+                ctx.strokeStyle = 'rgba(255,43,214,0.16)';
+                ctx.beginPath(); ctx.moveTo(xx + cell * 0.2, yy + cell * 0.86); ctx.lineTo(xx + cell * 0.86, yy + cell * 0.2); ctx.stroke();
+              }
+            } else if (isMedieval) {
+              const inset = Math.max(2, cell * 0.04);
+              ctx.beginPath();
+              drawRoundedRect(xx + inset, yy + inset, cell - inset * 2, cell - inset * 2, 3);
+              ctx.fillStyle = (x + y) % 2 ? 'rgba(255,218,145,0.035)' : 'rgba(0,0,0,0.055)';
+              ctx.fill();
+              ctx.strokeStyle = 'rgba(30,14,4,0.48)';
+              ctx.lineWidth = Math.max(1.15, cell * 0.018);
+              ctx.stroke();
+              ctx.strokeStyle = 'rgba(255,224,159,0.095)';
+              ctx.beginPath(); ctx.moveTo(xx + inset, yy + inset + 1); ctx.lineTo(xx + cell - inset, yy + inset + 1); ctx.stroke();
+            } else if (isVapor) {
+              const inset = Math.max(1.5, cell * 0.032);
+              ctx.fillStyle = (x + y) % 2 ? 'rgba(255,113,206,0.22)' : 'rgba(1,205,254,0.2)';
+              ctx.fillRect(xx + inset, yy + inset, cell - inset * 2, cell - inset * 2);
+              ctx.strokeStyle = 'rgba(255,255,255,0.86)';
+              ctx.lineWidth = Math.max(1.3, cell * 0.022);
+              ctx.strokeRect(xx + inset, yy + inset, cell - inset * 2, cell - inset * 2);
+            }
+          }
+        }
+
+        ctx.save();
+        ctx.strokeStyle = cssVar('--grid-strong') || cssVar('--grid-line');
+        ctx.lineWidth = is8Bit ? 4 : isCyber ? 2 : isVapor ? 4 : isMedieval ? 5 : is3D ? 2 : 1.5;
+        if (isMedieval) ctx.strokeStyle = '#2a1408';
+        if (isVapor) ctx.strokeStyle = '#ffffff';
+        if (is8Bit) ctx.strokeStyle = '#f8f8f8';
+        ctx.strokeRect(ctx.lineWidth / 2, ctx.lineWidth / 2, size - ctx.lineWidth, size - ctx.lineWidth);
+        ctx.restore();
+
+        let pathScale = is8Bit ? 0.42 : isPlain ? 0.34 : is3D ? 0.41 : isCyber ? 0.36 : isMedieval ? 0.30 : 0.42;
+        if (look === 'variant1') pathScale *= isMedieval ? 0.82 : isVapor ? 0.78 : is8Bit ? 0.8 : 0.88;
+        if (look === 'variant2') pathScale *= isPlain || isCyber || is8Bit ? 1.05 : 0.96;
+        const pathWidth = Math.max(is8Bit ? 8 : 9, cell * pathScale);
+        let dotScale = is8Bit ? 0.31 : isPlain ? 0.27 : is3D ? 0.31 : isCyber ? 0.29 : isMedieval ? 0.27 : 0.28;
+        if (look === 'variant1') dotScale *= isVapor || isMedieval ? 0.86 : 0.92;
+        if (look === 'variant2') dotScale *= is8Bit ? 0.98 : 0.94;
+        const dotRadius = Math.min(cell * 0.31, Math.max(is8Bit ? 8 : 9, cell * dotScale));
+
+        const drawPath = (pipe, path, complete) => {
+          if (!path || path.length < 2) return;
+          const color = pipe.color;
+          ctx.save();
+          const hardSquareLook = look === 'variant2' && (isPlain || isCyber || isVapor || is8Bit);
+          ctx.lineCap = hardSquareLook || is8Bit || isMedieval ? 'butt' : 'round';
+          ctx.lineJoin = hardSquareLook || is8Bit ? 'miter' : (isMedieval ? 'bevel' : 'round');
+          ctx.globalAlpha = 1;
+          ctx.shadowBlur = 0;
+
+          const drawSquarePolyline = (drawPathCells, width, strokeStyle) => {
+            ctx.save();
+            ctx.lineCap = 'butt';
+            ctx.lineJoin = 'miter';
+            drawPolyline(drawPathCells);
+            ctx.lineWidth = width;
+            ctx.strokeStyle = strokeStyle;
+            ctx.stroke();
+            ctx.restore();
+          };
+
+          if (is8Bit) {
+            const pixelWidth = Math.max(6, Math.round(pathWidth / 2) * 2);
+            drawSquarePolyline(path, pixelWidth + 8, '#000');
+            if (look === 'variant1') drawSquarePolyline(path, pixelWidth + 4, '#f8f8f8');
+            if (look === 'variant2') {
+              drawSquarePolyline(path, pixelWidth + 8, shadeColor(color, -55));
+              drawSquarePolyline(path, pixelWidth, color);
+              ctx.setLineDash([Math.max(4, cell * 0.16), Math.max(3, cell * 0.09)]);
+              drawPolyline(path); ctx.strokeStyle = '#fff200'; ctx.lineWidth = Math.max(2, pixelWidth * 0.22); ctx.stroke(); ctx.setLineDash([]);
+            } else {
+              drawSquarePolyline(path, pixelWidth, color);
+              if (look === 'variant1') drawSquarePolyline(path, Math.max(2, pixelWidth * 0.28), '#000');
+            }
+          } else if (isPlain) {
+            drawPolyline(path);
+            ctx.strokeStyle = 'rgba(255,255,255,0.96)';
+            ctx.lineWidth = pathWidth + 5;
+            ctx.stroke();
+            drawPolyline(path);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = pathWidth;
+            ctx.stroke();
+            if (look === 'variant1') {
+              drawPolyline(path); ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = Math.max(2, pathWidth * 0.2); ctx.stroke();
+            } else if (look === 'variant2') {
+              ctx.save(); ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+              drawPolyline(path); ctx.strokeStyle = shadeColor(color, -38); ctx.lineWidth = pathWidth + 3; ctx.stroke();
+              drawPolyline(path); ctx.strokeStyle = color; ctx.lineWidth = pathWidth - 2; ctx.stroke();
+              ctx.restore();
+            }
+          } else if (is3D) {
+            drawPolyline(path);
+            ctx.strokeStyle = 'rgba(0,0,0,0.78)';
+            ctx.lineWidth = pathWidth + 8;
+            ctx.stroke();
+            drawPolyline(path);
+            ctx.strokeStyle = shadeColor(color, -45);
+            ctx.lineWidth = pathWidth + 2;
+            ctx.stroke();
+            drawPolyline(path);
+            ctx.strokeStyle = makeGradient(0, 0, size, size, shadeColor(color, 36), shadeColor(color, -18));
+            ctx.lineWidth = pathWidth;
+            ctx.stroke();
+            drawPolyline(path);
+            ctx.strokeStyle = 'rgba(255,255,255,0.62)';
+            ctx.lineWidth = Math.max(2, pathWidth * 0.23);
+            ctx.stroke();
+            drawPolyline(path);
+            ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+            ctx.lineWidth = Math.max(1, pathWidth * 0.08);
+            ctx.stroke();
+            if (look === 'variant1') {
+              drawPolyline(path); ctx.strokeStyle = 'rgba(255,255,255,0.72)'; ctx.lineWidth = Math.max(3, pathWidth * 0.34); ctx.stroke();
+              drawPolyline(path); ctx.strokeStyle = shadeColor(color, -70); ctx.lineWidth = Math.max(1.5, pathWidth * 0.13); ctx.stroke();
+            } else if (look === 'variant2') {
+              drawPolyline(path); ctx.strokeStyle = 'rgba(0,0,0,0.24)'; ctx.lineWidth = Math.max(3, pathWidth * 0.42); ctx.stroke();
+            }
+          } else if (isCyber) {
+            drawPolyline(path);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = pathWidth + 9;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = complete ? 28 : 18;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            drawPolyline(path);
+            ctx.strokeStyle = 'rgba(0,0,12,0.95)';
+            ctx.lineWidth = pathWidth + 2;
+            ctx.stroke();
+            drawPolyline(path);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = pathWidth;
+            ctx.stroke();
+            drawPolyline(path);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = Math.max(1.5, pathWidth * 0.18);
+            ctx.stroke();
+            if (look === 'variant1') {
+              ctx.setLineDash([Math.max(5, cell * 0.18), Math.max(4, cell * 0.1)]);
+              drawPolyline(path); ctx.strokeStyle = shadeColor(color, 35); ctx.lineWidth = Math.max(2, pathWidth * 0.34); ctx.stroke(); ctx.setLineDash([]);
+            } else if (look === 'variant2') {
+              ctx.save(); ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+              drawPolyline(path); ctx.strokeStyle = color; ctx.lineWidth = pathWidth * 0.92; ctx.stroke();
+              drawPolyline(path); ctx.strokeStyle = '#02030b'; ctx.lineWidth = Math.max(2, pathWidth * 0.16); ctx.stroke();
+              ctx.restore();
+            }
+          } else if (isMedieval) {
+            drawPolyline(path);
+            ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+            ctx.lineWidth = pathWidth + 8;
+            ctx.stroke();
+            drawPolyline(path);
+            ctx.strokeStyle = shadeColor(color, -30);
+            ctx.lineWidth = pathWidth + 2;
+            ctx.stroke();
+            drawPolyline(path);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = pathWidth;
+            ctx.stroke();
+            ctx.setLineDash([Math.max(3, cell * 0.08), Math.max(4, cell * 0.1)]);
+            drawPolyline(path);
+            ctx.strokeStyle = 'rgba(255,229,178,0.38)';
+            ctx.lineWidth = Math.max(2, pathWidth * 0.24);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            if (look === 'variant1') {
+              drawPolyline(path); ctx.strokeStyle = '#15100b'; ctx.lineWidth = pathWidth + 4; ctx.stroke();
+              drawPolyline(path); ctx.strokeStyle = shadeColor(color, 30); ctx.lineWidth = pathWidth * 0.58; ctx.stroke();
+            } else if (look === 'variant2') {
+              ctx.save(); ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+              drawPolyline(path); ctx.strokeStyle = 'rgba(255,231,178,0.44)'; ctx.lineWidth = pathWidth + 3; ctx.stroke();
+              drawPolyline(path); ctx.strokeStyle = color; ctx.lineWidth = pathWidth * 0.86; ctx.stroke();
+              ctx.restore();
+            }
+          } else if (isVapor) {
+            drawPolyline(path);
+            ctx.strokeStyle = 'rgba(255,255,255,0.96)';
+            ctx.lineWidth = pathWidth + 9;
+            ctx.stroke();
+            drawPolyline(path);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = pathWidth;
+            ctx.stroke();
+            drawPolyline(path);
+            ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+            ctx.lineWidth = Math.max(3, pathWidth * 0.36);
+            ctx.stroke();
+            if (look === 'variant1') {
+              drawPolyline(path); ctx.strokeStyle = 'rgba(255,255,255,0.86)'; ctx.lineWidth = Math.max(2, pathWidth * 0.22); ctx.stroke();
+              drawPolyline(path); ctx.strokeStyle = 'rgba(53,16,95,0.16)'; ctx.lineWidth = Math.max(1, pathWidth * 0.08); ctx.stroke();
+            } else if (look === 'variant2') {
+              ctx.save(); ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+              drawPolyline(path); ctx.strokeStyle = color; ctx.lineWidth = pathWidth * 0.88; ctx.stroke();
+              drawPolyline(path); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = Math.max(2, pathWidth * 0.16); ctx.stroke();
+              ctx.restore();
+            }
+            if (complete) {
+              drawPolyline(path);
+              ctx.strokeStyle = '#ffffff';
+              ctx.lineWidth = Math.max(1.5, pathWidth * 0.12);
+              ctx.stroke();
+            }
+          }
+          ctx.restore();
         };
 
-        let currentTheme = 'theme-3d';
-        let currentPalette = Themes[currentTheme].palettes[Object.keys(Themes[currentTheme].palettes)[0]];
+        for (const pipe of level.pipes) drawPath(pipe, state.playerPaths[pipe.id], !!state.completed[pipe.id]);
 
-        function populatePalettes() {
-            const select = document.getElementById('palette-select'); select.innerHTML = '';
-            for (let pName in Themes[currentTheme].palettes) {
-                let opt = document.createElement('option'); opt.value = pName; opt.textContent = pName; select.appendChild(opt);
+        // Style-specific decorative passes. Kept separate from geometry so the no-double-back
+        // generator and validation remain untouched.
+        for (const pipe of level.pipes) {
+          const path = state.playerPaths[pipe.id];
+          if (!path || path.length < 2) continue;
+          const color = pipe.color;
+          if (isCyber && look === 'variant2') {
+            ctx.save();
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 10;
+            const node = Math.max(3, cell * 0.075);
+            for (let i = 1; i < path.length - 1; i++) {
+              const p = cellCenter(path[i]);
+              ctx.fillRect(Math.round(p.x - node), Math.round(p.y - node), Math.round(node * 2), Math.round(node * 2));
             }
-            currentPalette = Themes[currentTheme].palettes[select.value];
+            ctx.restore();
+          } else if (isMedieval && look === 'variant1') {
+            ctx.save();
+            const node = Math.max(2.5, cell * 0.055);
+            for (let i = 1; i < path.length - 1; i++) {
+              const p = cellCenter(path[i]);
+              ctx.beginPath(); ctx.fillStyle = '#16100b'; ctx.arc(p.x, p.y, node * 1.6, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.fillStyle = 'rgba(225,225,214,0.85)'; ctx.arc(p.x, p.y, node, 0, Math.PI * 2); ctx.fill();
+            }
+            ctx.restore();
+          } else if (is8Bit && look === 'variant2') {
+            ctx.save();
+            ctx.globalAlpha = 0.58;
+            ctx.fillStyle = '#fff200';
+            const bar = Math.max(2, Math.round(cell * 0.045));
+            for (let i = 0; i < path.length; i++) {
+              const p = cellCenter(path[i]);
+              ctx.fillRect(Math.round(p.x - cell * 0.16), Math.round(p.y - bar / 2), Math.round(cell * 0.32), bar);
+            }
+            ctx.restore();
+          }
         }
 
-        document.getElementById('theme-select').addEventListener('change', (e) => {
-            document.body.classList.remove(currentTheme); currentTheme = e.target.value; document.body.classList.add(currentTheme);
-            populatePalettes(); drawBoard();
-        });
+        const drawEndpoint = (pipe, point, complete) => {
+          const { x, y } = cellCenter(point);
+          const color = pipe.color;
+          ctx.save();
+          if (is8Bit) {
+            const r = Math.max(7, Math.round(dotRadius));
+            ctx.fillStyle = '#000'; ctx.fillRect(Math.round(x - r - 4), Math.round(y - r - 4), Math.round((r + 4) * 2), Math.round((r + 4) * 2));
+            if (look === 'variant1') { ctx.fillStyle = '#f8f8f8'; ctx.fillRect(Math.round(x - r - 2), Math.round(y - r - 2), Math.round((r + 2) * 2), Math.round((r + 2) * 2)); ctx.fillStyle = '#000'; ctx.fillRect(Math.round(x - r + 3), Math.round(y - r + 3), Math.round((r - 3) * 2), Math.round((r - 3) * 2)); }
+            ctx.fillStyle = color; ctx.fillRect(Math.round(x - r), Math.round(y - r), Math.round(r * 2), Math.round(r * 2));
+            if (look === 'variant2') { ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.fillRect(Math.round(x - r), Math.round(y - r), Math.round(r * 2), Math.max(2, Math.round(r * 0.3))); }
+          } else if (isPlain) {
+            if (look === 'variant2') {
+              const r = Math.round(dotRadius);
+              ctx.fillStyle = 'rgba(0,0,0,0.48)';
+              ctx.fillRect(Math.round(x - r - 3), Math.round(y - r - 3), Math.round((r + 3) * 2), Math.round((r + 3) * 2));
+              ctx.fillStyle = '#eaf2ff';
+              ctx.fillRect(Math.round(x - r - 1), Math.round(y - r - 1), Math.round((r + 1) * 2), Math.round((r + 1) * 2));
+              ctx.fillStyle = color;
+              ctx.fillRect(Math.round(x - r), Math.round(y - r), Math.round(r * 2), Math.round(r * 2));
+              ctx.fillStyle = 'rgba(0,0,0,0.16)';
+              ctx.fillRect(Math.round(x - r), Math.round(y + r * 0.35), Math.round(r * 2), Math.max(2, Math.round(r * 0.25)));
+            } else {
+              ctx.beginPath(); ctx.fillStyle = '#fff'; ctx.arc(x, y, dotRadius + 4, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.strokeStyle = 'rgba(15,23,42,0.17)'; ctx.lineWidth = 1.5; ctx.arc(x, y, dotRadius + 4, 0, Math.PI * 2); ctx.stroke();
+              ctx.beginPath(); ctx.fillStyle = color; ctx.arc(x, y, dotRadius, 0, Math.PI * 2); ctx.fill();
+              if (look === 'variant1') { ctx.beginPath(); ctx.fillStyle = 'rgba(255,255,255,0.34)'; ctx.arc(x - dotRadius * 0.25, y - dotRadius * 0.25, dotRadius * 0.35, 0, Math.PI * 2); ctx.fill(); }
+            }
+          } else if (is3D) {
+            ctx.beginPath(); ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.arc(x, y + 4, dotRadius + 6, 0, Math.PI * 2); ctx.fill();
+            const g = ctx.createRadialGradient(x - dotRadius * 0.35, y - dotRadius * 0.35, 2, x, y, dotRadius + 5);
+            g.addColorStop(0, '#fff'); g.addColorStop(0.22, shadeColor(color, 55)); g.addColorStop(0.72, color); g.addColorStop(1, shadeColor(color, -55));
+            ctx.beginPath(); ctx.fillStyle = g; ctx.arc(x, y, dotRadius + 2, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 2; ctx.arc(x - 2, y - 2, dotRadius * 0.58, Math.PI * 1.05, Math.PI * 1.75); ctx.stroke();
+            if (look === 'variant1') { ctx.beginPath(); ctx.strokeStyle = 'rgba(255,255,255,0.72)'; ctx.lineWidth = Math.max(2, dotRadius * 0.22); ctx.arc(x, y, dotRadius * 0.42, 0, Math.PI * 2); ctx.stroke(); }
+            if (look === 'variant2') { ctx.beginPath(); ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.arc(x, y + dotRadius * 0.2, dotRadius * 0.74, 0, Math.PI * 2); ctx.fill(); }
+          } else if (isCyber) {
+            if (look === 'variant2') {
+              const r = Math.round(Math.min(dotRadius + 2, cell * 0.34));
+              ctx.shadowColor = color; ctx.shadowBlur = complete ? 24 : 15;
+              ctx.fillStyle = color;
+              ctx.fillRect(Math.round(x - r), Math.round(y - r), Math.round(r * 2), Math.round(r * 2));
+              ctx.shadowBlur = 0;
+              ctx.fillStyle = '#02030b';
+              ctx.fillRect(Math.round(x - r * 0.62), Math.round(y - r * 0.62), Math.round(r * 1.24), Math.round(r * 1.24));
+              ctx.strokeStyle = '#ffffff'; ctx.lineWidth = Math.max(2, dotRadius * 0.16);
+              ctx.strokeRect(Math.round(x - r), Math.round(y - r), Math.round(r * 2), Math.round(r * 2));
+              ctx.fillStyle = color;
+              ctx.fillRect(Math.round(x - r * 0.18), Math.round(y - r), Math.max(2, Math.round(r * 0.36)), Math.round(r * 2));
+              ctx.fillRect(Math.round(x - r), Math.round(y - r * 0.18), Math.round(r * 2), Math.max(2, Math.round(r * 0.36)));
+            } else {
+              ctx.shadowColor = color; ctx.shadowBlur = complete ? 25 : 16;
+              ctx.beginPath(); ctx.fillStyle = color; ctx.arc(x, y, dotRadius + 2, 0, Math.PI * 2); ctx.fill();
+              ctx.shadowBlur = 0;
+              ctx.beginPath(); ctx.fillStyle = '#02030b'; ctx.arc(x, y, dotRadius * 0.7, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.fillStyle = color; ctx.arc(x, y, dotRadius * 0.42, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.6; ctx.arc(x, y, Math.min(dotRadius + 3, cell * 0.35), 0, Math.PI * 2); ctx.stroke();
+              if (look === 'variant1') { ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = Math.max(2, dotRadius * 0.2); ctx.moveTo(x - dotRadius * 0.75, y); ctx.lineTo(x + dotRadius * 0.75, y); ctx.moveTo(x, y - dotRadius * 0.75); ctx.lineTo(x, y + dotRadius * 0.75); ctx.stroke(); }
+            }
+          } else if (isMedieval) {
+            const halo = Math.min(dotRadius + 3, cell * 0.34);
+            ctx.beginPath(); ctx.fillStyle = 'rgba(0,0,0,0.42)'; ctx.arc(x + 1.5, y + 2.2, halo, 0, Math.PI * 2); ctx.fill();
+            if (look === 'variant1') {
+              ctx.beginPath(); ctx.fillStyle = '#252018'; ctx.arc(x, y, halo, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.strokeStyle = '#bfc5c7'; ctx.lineWidth = Math.max(3, dotRadius * 0.22); ctx.arc(x, y, dotRadius * 0.72, 0, Math.PI * 2); ctx.stroke();
+              ctx.beginPath(); ctx.fillStyle = color; ctx.arc(x, y, dotRadius * 0.52, 0, Math.PI * 2); ctx.fill();
+            } else if (look === 'variant2') {
+              ctx.beginPath(); drawRoundedRect(x - dotRadius * 0.95, y - dotRadius * 0.95, dotRadius * 1.9, dotRadius * 1.9, 3); ctx.fillStyle = color; ctx.fill();
+              ctx.beginPath(); ctx.strokeStyle = 'rgba(255,231,178,0.65)'; ctx.lineWidth = 2; drawRoundedRect(x - dotRadius * 0.96, y - dotRadius * 0.96, dotRadius * 1.92, dotRadius * 1.92, 3); ctx.stroke();
+            } else {
+              ctx.beginPath(); ctx.fillStyle = '#1d1209'; ctx.arc(x, y, halo, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.fillStyle = color; ctx.arc(x, y, dotRadius * 0.86, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.strokeStyle = 'rgba(255,226,170,0.45)'; ctx.lineWidth = 2; ctx.arc(x, y, dotRadius * 0.58, 0, Math.PI * 2); ctx.stroke();
+              ctx.beginPath(); ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 2; ctx.moveTo(x - dotRadius * 0.46, y); ctx.lineTo(x + dotRadius * 0.46, y); ctx.moveTo(x, y - dotRadius * 0.46); ctx.lineTo(x, y + dotRadius * 0.46); ctx.stroke();
+            }
+          } else if (isVapor) {
+            const halo = Math.min(dotRadius + 3, cell * 0.34);
+            if (look === 'variant2') {
+              ctx.beginPath(); ctx.fillStyle = 'rgba(53,16,95,0.16)'; ctx.fillRect(x - halo + 2, y - halo + 3, halo * 2, halo * 2); 
+              ctx.beginPath(); ctx.fillStyle = '#fff'; ctx.fillRect(x - halo, y - halo, halo * 2, halo * 2);
+              ctx.beginPath(); ctx.fillStyle = color; ctx.fillRect(x - dotRadius * 0.78, y - dotRadius * 0.78, dotRadius * 1.56, dotRadius * 1.56);
+            } else if (look === 'variant1') {
+              ctx.beginPath(); ctx.fillStyle = 'rgba(53,16,95,0.15)'; ctx.arc(x + 1.5, y + 2.5, halo, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.strokeStyle = '#fff'; ctx.lineWidth = Math.max(3, dotRadius * 0.28); ctx.arc(x, y, dotRadius * 0.86, 0, Math.PI * 2); ctx.stroke();
+              ctx.beginPath(); ctx.fillStyle = color; ctx.arc(x, y, dotRadius * 0.55, 0, Math.PI * 2); ctx.fill();
+            } else {
+              ctx.beginPath(); ctx.fillStyle = 'rgba(53,16,95,0.16)'; ctx.arc(x + 1.5, y + 2.5, halo, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.fillStyle = '#fff'; ctx.arc(x, y, halo, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.fillStyle = color; ctx.arc(x, y, dotRadius * 0.92, 0, Math.PI * 2); ctx.fill();
+              ctx.beginPath(); ctx.fillStyle = 'rgba(255,255,255,0.72)'; ctx.arc(x - dotRadius * 0.22, y - dotRadius * 0.22, dotRadius * 0.32, 0, Math.PI * 2); ctx.fill();
+            }
+          }
+          if (complete) {
+            ctx.fillStyle = is8Bit ? '#000' : isCyber ? '#fff' : isMedieval ? '#ffe9b8' : '#ffffff';
+            const mark = Math.max(3, dotRadius * 0.22);
+            if (look === 'variant2' && (isPlain || isCyber || isVapor || is8Bit)) {
+              ctx.fillRect(Math.round(x - mark), Math.round(y - mark), Math.round(mark * 2), Math.round(mark * 2));
+            } else {
+              ctx.beginPath();
+              ctx.arc(x, y, mark, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+          ctx.restore();
+        };
 
-        document.getElementById('palette-select').addEventListener('change', (e) => {
-            currentPalette = Themes[currentTheme].palettes[e.target.value];
-            if (level) { level.solution.forEach((s, i) => s.color = currentPalette[i % currentPalette.length]); resetPaths(false); }
+        for (const pipe of level.pipes) {
+          drawEndpoint(pipe, pipe.path[0], !!state.completed[pipe.id]);
+          drawEndpoint(pipe, pipe.path[pipe.path.length - 1], !!state.completed[pipe.id]);
+        }
+      }
+
+      function resetPlayerPaths() {
+        state.playerPaths = {};
+        state.completed = {};
+        for (const pipe of state.level.pipes) {
+          state.playerPaths[pipe.id] = [];
+          state.completed[pipe.id] = false;
+        }
+      }
+
+      function snapshot() {
+        return JSON.stringify(state.playerPaths);
+      }
+
+      function saveUndo() {
+        const snap = snapshot();
+        if (state.undoStack[state.undoStack.length - 1] === snap) return;
+        state.undoStack.push(snap);
+        if (state.undoStack.length > 80) state.undoStack.shift();
+        $('undo-button').disabled = false;
+      }
+
+      function updateTopStats() {
+        $('moves-display').textContent = String(state.stats.moves);
+        $('hints-display').textContent = String(state.stats.hints);
+        $('metric-undos').textContent = String(state.stats.undos);
+      }
+
+      function highScoreKey() {
+        const s = state.settings;
+        return `flow_forge_v5_${s.size}_${s.difficulty}_${s.generator}`;
+      }
+
+      function updateHighScore() {
+        $('metric-best').textContent = localStorage.getItem(highScoreKey()) || '0';
+      }
+
+      function formatTime(ms) {
+        const seconds = Math.floor(ms / 1000);
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${String(s).padStart(2, '0')}`;
+      }
+
+      function timerElapsed() {
+        if (!state.timerStarted) return state.elapsedBeforePause;
+        return state.elapsedBeforePause + Date.now() - state.timerStartMs;
+      }
+
+      function renderTimer() {
+        $('timer-display').textContent = formatTime(timerElapsed());
+      }
+
+      function startTimerIfNeeded() {
+        if (state.timerStarted || state.gameWon) return;
+        state.timerStarted = true;
+        state.timerStartMs = Date.now();
+        clearInterval(state.timerHandle);
+        state.timerHandle = setInterval(renderTimer, 250);
+        renderTimer();
+      }
+
+      function stopTimer() {
+        if (state.timerStarted) {
+          state.elapsedBeforePause = timerElapsed();
+        }
+        state.timerStarted = false;
+        clearInterval(state.timerHandle);
+        state.timerHandle = null;
+        renderTimer();
+      }
+
+      function resetTimer() {
+        clearInterval(state.timerHandle);
+        state.timerStarted = false;
+        state.timerStartMs = 0;
+        state.elapsedBeforePause = 0;
+        state.timerHandle = null;
+        $('timer-display').textContent = '0:00';
+      }
+
+      function validPlayerPath(path) {
+        if (!path || path.length === 0) {
+          return { ok: true, duplicates: false, adjacent: true, hairpin: false, selfTouch: false };
+        }
+
+        const seen = new Set();
+        const indexByCell = new Map();
+        let duplicates = false;
+        let adj = true;
+        let hairpin = false;
+        let selfTouch = false;
+
+        for (let i = 0; i < path.length; i++) {
+          const k = keyOf(path[i]);
+          if (seen.has(k)) duplicates = true;
+          seen.add(k);
+          indexByCell.set(k, i);
+          if (i > 0 && !adjacent(path[i - 1], path[i])) adj = false;
+        }
+
+        // Reject tight 2x2 U-turns/hairpins: e.g. right, down, left.
+        // The generator already avoids these; player paths must obey the same rule.
+        for (let i = 0; i < path.length - 3; i++) {
+          const d1 = { x: path[i + 1].x - path[i].x, y: path[i + 1].y - path[i].y };
+          const d2 = { x: path[i + 2].x - path[i + 1].x, y: path[i + 2].y - path[i + 1].y };
+          const d3 = { x: path[i + 3].x - path[i + 2].x, y: path[i + 3].y - path[i + 2].y };
+          if ((d2.x !== 0 || d2.y !== 0) && d1.x === -d3.x && d1.y === -d3.y) {
+            hairpin = true;
+            break;
+          }
+        }
+
+        // Induced-path rule: cells from the same user path may not sit orthogonally
+        // next to each other unless they are consecutive in the path sequence. This
+        // blocks larger self-touching double-backs that can otherwise look valid.
+        for (let i = 0; i < path.length; i++) {
+          const p = path[i];
+          const neighbors = [
+            { x: p.x + 1, y: p.y }, { x: p.x - 1, y: p.y },
+            { x: p.x, y: p.y + 1 }, { x: p.x, y: p.y - 1 }
+          ];
+          for (const n of neighbors) {
+            const j = indexByCell.get(keyOf(n));
+            if (j === undefined) continue;
+            if (Math.abs(i - j) !== 1) {
+              selfTouch = true;
+              break;
+            }
+          }
+          if (selfTouch) break;
+        }
+
+        return {
+          ok: !duplicates && adj && !hairpin && !selfTouch,
+          duplicates,
+          adjacent: adj,
+          hairpin,
+          selfTouch
+        };
+      }
+
+      function updateMetrics() {
+        if (!state.level) return;
+        const occupied = new Map();
+        let connected = 0;
+        let overlap = false;
+        let invalid = false;
+
+        for (const pipe of state.level.pipes) {
+          const path = state.playerPaths[pipe.id] || [];
+          state.completed[pipe.id] = false;
+          const val = validPlayerPath(path);
+          if (!val.ok) invalid = true;
+
+          for (let i = 0; i < path.length; i++) {
+            const k = keyOf(path[i]);
+            if (occupied.has(k)) overlap = true;
+            occupied.set(k, pipe.id);
+          }
+
+          if (path.length >= 2 && val.ok) {
+            const a = path[0];
+            const b = path[path.length - 1];
+            const s = pipe.path[0];
+            const e = pipe.path[pipe.path.length - 1];
+            const matches = (sameCell(a, s) && sameCell(b, e)) || (sameCell(a, e) && sameCell(b, s));
+            if (matches) {
+              state.completed[pipe.id] = true;
+              connected++;
+            }
+          }
+        }
+
+        const total = state.level.width * state.level.height;
+        const filled = occupied.size;
+        const pct = Math.round((filled / total) * 100);
+        $('metric-connected').textContent = `${connected}/${state.level.pipes.length}`;
+        $('metric-filled').textContent = `${pct}%`;
+
+        const complete = connected === state.level.pipes.length && filled === total && !overlap && !invalid;
+        const blockedByShape = connected === state.level.pipes.length && filled === total && !overlap && invalid;
+        if (blockedByShape && !state.gameWon && !state.animating) {
+          $('status-text').innerHTML = '<strong>Shape issue.</strong> A completed path has a hairpin or double-back.';
+        }
+        if (complete && !state.gameWon && !state.animating) finishGame();
+        updateTopStats();
+      }
+
+      function finishGame() {
+        state.gameWon = true;
+        stopTimer();
+        const onlyHints = state.stats.hints > 0 && state.stats.moves === 0;
+        const elapsedSeconds = Math.max(1, Math.floor(state.elapsedBeforePause / 1000));
+        const diffMult = state.settings.difficulty === 'hard' ? 1.65 : state.settings.difficulty === 'easy' ? 0.68 : 1.12;
+        const genMult = state.settings.generator === 'aesthetic' ? 1.08 : 1.0;
+        const totalCells = state.level.width * state.level.height;
+        const base = totalCells * 105 * diffMult * genMult;
+        const score = Math.max(10, Math.round(base - elapsedSeconds * 9 - state.stats.moves * 38 - state.stats.hints * 260 - state.stats.undos * 18));
+        state.lastScore = onlyHints ? 0 : score;
+
+        if (onlyHints) {
+          $('score-label').textContent = 'Practice clear';
+          $('final-score').textContent = 'No Score';
+          $('new-best').classList.remove('active');
+          $('status-text').innerHTML = '<strong>Practice clear.</strong> Hints solved the whole board, so no score was recorded.';
+        } else {
+          $('score-label').textContent = 'Final score';
+          $('final-score').textContent = String(score);
+          const key = highScoreKey();
+          const prev = parseInt(localStorage.getItem(key) || '0', 10);
+          if (score > prev) {
+            localStorage.setItem(key, String(score));
+            $('new-best').classList.add('active');
+          } else {
+            $('new-best').classList.remove('active');
+          }
+          $('status-text').innerHTML = '<strong>Cleared.</strong> Full board, valid endpoints, no overlaps.';
+        }
+
+        updateHighScore();
+        $('win-overlay').classList.add('active');
+      }
+
+      function initGame() {
+        const palette = currentPalette();
+        const count = pipeCountFor(state.settings.size, state.settings.difficulty);
+        $('status-text').innerHTML = '<strong>Forging level…</strong>';
+        $('win-overlay').classList.remove('active');
+        $('score-label').textContent = 'Final score';
+        $('final-score').textContent = '0';
+        $('new-best').classList.remove('active');
+        state.gameWon = false;
+        state.animating = false;
+        state.drawing = false;
+        state.activePipeId = null;
+        state.activePointerId = null;
+        state.lastPointerCell = null;
+        state.stats = { moves: 0, hints: 0, undos: 0, resets: 0 };
+        state.undoStack = [];
+        $('undo-button').disabled = true;
+        resetTimer();
+
+        const generator = new PathCoverGenerator(state.settings.size, state.settings.size, count, palette, state.settings.generator, state.settings.difficulty);
+        state.level = generator.generate();
+        resetPlayerPaths();
+        updateHighScore();
+        updateMetrics();
+        updateLevelLabels();
+        scheduleResize();
+        requestAnimationFrame(() => {
+          resizeCanvas();
+          $('status-text').innerHTML = '<strong>Ready.</strong> Draw from matching endpoints.';
+        });
+      }
+
+      function updateLevelLabels() {
+        const genName = state.settings.generator === 'aesthetic' ? 'Aesthetic Forge' : 'Original Forge';
+        $('generator-label').textContent = genName;
+        $('level-subtitle').textContent = `${state.settings.size}×${state.settings.size} · ${state.settings.difficulty} · ${state.level ? state.level.pipes.length : 0} pipes`;
+      }
+
+      function pipeAtEndpoint(cell) {
+        if (!state.level) return null;
+        for (const pipe of state.level.pipes) {
+          const a = pipe.path[0];
+          const b = pipe.path[pipe.path.length - 1];
+          if (sameCell(cell, a) || sameCell(cell, b)) return pipe;
+        }
+        return null;
+      }
+
+      function pipeAtPlayerCell(cell) {
+        for (const pipe of state.level.pipes) {
+          const path = state.playerPaths[pipe.id] || [];
+          const idx = path.findIndex(p => sameCell(p, cell));
+          if (idx !== -1) return { pipe, idx };
+        }
+        return null;
+      }
+
+      function isOtherEndpoint(cell, pipeId) {
+        return state.level.pipes.some(pipe => {
+          if (pipe.id === pipeId) return false;
+          return sameCell(cell, pipe.path[0]) || sameCell(cell, pipe.path[pipe.path.length - 1]);
+        });
+      }
+
+      function occupiedBy(cell, exceptPipeId = null) {
+        for (const pipe of state.level.pipes) {
+          if (pipe.id === exceptPipeId) continue;
+          const path = state.playerPaths[pipe.id] || [];
+          const idx = path.findIndex(p => sameCell(p, cell));
+          if (idx !== -1) return { pipeId: pipe.id, idx };
+        }
+        return null;
+      }
+
+      function validStep(cell, pipeId) {
+        if (!state.level) return false;
+        if (cell.x < 0 || cell.y < 0 || cell.x >= state.level.width || cell.y >= state.level.height) return false;
+        if (isOtherEndpoint(cell, pipeId)) return false;
+        const own = state.playerPaths[pipeId] || [];
+        if (own.some(p => sameCell(p, cell))) return false;
+        const occ = occupiedBy(cell, pipeId);
+        if (occ && !state.settings.allowBreaks) return false;
+        return true;
+      }
+
+      function routeBetween(start, target, pipeId) {
+        // Adjustable assist: first follow the traced gesture exactly, then allow a
+        // bounded local correction. The slider changes the correction radius/budget,
+        // not the core rule that the pipe should obey the player's finger.
+        if (sameCell(start, target)) return [];
+
+        const assist = clamp((state.settings.inputAssist ?? 75) / 100, 0, 1);
+        const dx = target.x - start.x;
+        const dy = target.y - start.y;
+        const ax = Math.abs(dx);
+        const ay = Math.abs(dy);
+        const sx = Math.sign(dx);
+        const sy = Math.sign(dy);
+        const manhattan = ax + ay;
+
+        const walkAxis = (from, axis, dir) => axis === 'x'
+          ? { x: from.x + dir, y: from.y }
+          : { x: from.x, y: from.y + dir };
+
+        const buildRoute = (order) => {
+          const route = [];
+          let curr = { x: start.x, y: start.y };
+          for (const axis of order) {
+            const count = axis === 'x' ? ax : ay;
+            const dir = axis === 'x' ? sx : sy;
+            for (let i = 0; i < count; i++) {
+              curr = walkAxis(curr, axis, dir);
+              if (!validStep(curr, pipeId)) return null;
+              route.push(curr);
+            }
+          }
+          return sameCell(curr, target) ? route : null;
+        };
+
+        const preferredOrders = [];
+        if (dx === 0 || dy === 0) preferredOrders.push(dx === 0 ? ['y'] : ['x']);
+        if (ax >= ay) preferredOrders.push(['x', 'y'], ['y', 'x']);
+        else preferredOrders.push(['y', 'x'], ['x', 'y']);
+
+        if (manhattan === 1) return validStep(target, pipeId) ? [target] : [];
+
+        // Fast straight swipes and simple corner swipes should feel effortless.
+        for (const order of preferredOrders) {
+          const route = buildRoute(order);
+          if (route) return route;
+        }
+
+        // At 0%, the assist is trace-only after direct bridging.
+        if (assist <= 0.01) return [];
+
+        // More forgiving default than the previous balanced pass, but still bounded.
+        // The search window grows slowly with assist strength and target distance.
+        const maxJump = Math.round(4 + assist * 6);          // 4..10 cells
+        if (manhattan > maxJump) return [];
+
+        const pad = Math.round(1 + assist * 3);              // 1..4 cells around gesture
+        const extraBudget = Math.round(2 + assist * 6);      // 2..8 detour cells
+        const maxLen = Math.min(18, manhattan + extraBudget);
+        const minX = Math.max(0, Math.min(start.x, target.x) - pad);
+        const maxX = Math.min(state.level.width - 1, Math.max(start.x, target.x) + pad);
+        const minY = Math.max(0, Math.min(start.y, target.y) - pad);
+        const maxY = Math.min(state.level.height - 1, Math.max(start.y, target.y) + pad);
+
+        const key = cell => `${cell.x},${cell.y}`;
+        const inWindow = cell => cell.x >= minX && cell.x <= maxX && cell.y >= minY && cell.y <= maxY;
+        const heuristic = cell => Math.abs(cell.x - target.x) + Math.abs(cell.y - target.y);
+        const driftFromTrace = cell => {
+          // Approximate distance from the bounding line/rectangle between start and target.
+          if (ax === 0) return Math.abs(cell.x - start.x);
+          if (ay === 0) return Math.abs(cell.y - start.y);
+          const vx = dx, vy = dy;
+          const wx = cell.x - start.x, wy = cell.y - start.y;
+          const area = Math.abs(vx * wy - vy * wx);
+          return area / Math.max(1, Math.sqrt(vx * vx + vy * vy));
+        };
+
+        const neighborPriority = cell => {
+          const base = [
+            { x: cell.x + sx, y: cell.y },
+            { x: cell.x, y: cell.y + sy },
+            { x: cell.x + sx, y: cell.y + sy }, // filtered out later as non-adjacent intent anchor only
+            { x: cell.x - sx, y: cell.y },
+            { x: cell.x, y: cell.y - sy },
+            { x: cell.x + 1, y: cell.y },
+            { x: cell.x - 1, y: cell.y },
+            { x: cell.x, y: cell.y + 1 },
+            { x: cell.x, y: cell.y - 1 }
+          ];
+          const seen = new Set();
+          return base.filter(n => {
+            if (Math.abs(n.x - cell.x) + Math.abs(n.y - cell.y) !== 1) return false;
+            const k = key(n);
+            if (seen.has(k)) return false;
+            seen.add(k);
+            return inWindow(n);
+          }).sort((a, b) => (heuristic(a) + driftFromTrace(a) * 0.75) - (heuristic(b) + driftFromTrace(b) * 0.75));
+        };
+
+        const queue = [{ cell: { x: start.x, y: start.y }, route: [] }];
+        const seenBest = new Map([[key(start), 0]]);
+
+        while (queue.length) {
+          const current = queue.shift();
+          if (current.route.length >= maxLen) continue;
+
+          for (const next of neighborPriority(current.cell)) {
+            if (!validStep(next, pipeId)) continue;
+            const nextRoute = current.route.concat([{ x: next.x, y: next.y }]);
+            const nextKey = key(next);
+            if (sameCell(next, target)) return nextRoute;
+
+            const best = seenBest.get(nextKey);
+            if (best !== undefined && best <= nextRoute.length) continue;
+            if (nextRoute.length + heuristic(next) > maxLen + 1) continue;
+            if (driftFromTrace(next) > pad + 0.85) continue;
+
+            seenBest.set(nextKey, nextRoute.length);
+            queue.push({ cell: next, route: nextRoute });
+          }
+        }
+
+        return [];
+      }
+
+      function cellFromEvent(event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = clamp(Math.floor((event.clientX - rect.left) / state.cellSize), 0, state.level.width - 1);
+        const y = clamp(Math.floor((event.clientY - rect.top) / state.cellSize), 0, state.level.height - 1);
+        return { x, y };
+      }
+
+      function trimOtherPathsAt(cell, pipeId) {
+        for (const pipe of state.level.pipes) {
+          if (pipe.id === pipeId) continue;
+          const path = state.playerPaths[pipe.id] || [];
+          const idx = path.findIndex(p => sameCell(p, cell));
+          if (idx !== -1) state.playerPaths[pipe.id] = path.slice(0, idx);
+        }
+      }
+
+      function isOwnEndpoint(cell, pipe) {
+        return sameCell(cell, pipe.path[0]) || sameCell(cell, pipe.path[pipe.path.length - 1]);
+      }
+
+      function trySnapToOwnEndpoint(pipe) {
+        // When the player releases just shy of the matching endpoint, finish the
+        // obvious connection. This keeps small touch misses from feeling punitive,
+        // while still requiring the endpoint to be genuinely nearby.
+        if (!pipe || !state.level) return false;
+        const path = state.playerPaths[pipe.id] || [];
+        if (!path.length) return false;
+
+        const last = path[path.length - 1];
+        if (isOwnEndpoint(last, pipe)) return false;
+
+        const snapMaxDistance = 2;
+        const endpoints = [pipe.path[0], pipe.path[pipe.path.length - 1]];
+        const candidates = endpoints
+          .filter(endpoint => !path.some(cell => sameCell(cell, endpoint)))
+          .map(endpoint => ({
+            endpoint,
+            distance: Math.abs(endpoint.x - last.x) + Math.abs(endpoint.y - last.y)
+          }))
+          .filter(item => item.distance >= 1 && item.distance <= snapMaxDistance)
+          .sort((a, b) => a.distance - b.distance);
+
+        for (const candidate of candidates) {
+          const route = routeBetween(last, candidate.endpoint, pipe.id);
+          if (!route.length || !sameCell(route[route.length - 1], candidate.endpoint)) continue;
+
+          // Snapping should feel like a magnetic endpoint, not a hidden mini-solver.
+          // One extra correction cell is allowed for touch slop; longer routes are ignored.
+          if (route.length > candidate.distance + 1) continue;
+
+          const beforeSnap = state.playerPaths[pipe.id].map(cell => ({ x: cell.x, y: cell.y }));
+          for (const step of route) {
+            if (!validStep(step, pipe.id)) break;
+            if (state.settings.allowBreaks) trimOtherPathsAt(step, pipe.id);
+            state.playerPaths[pipe.id].push(step);
+            if (isOwnEndpoint(step, pipe)) break;
+          }
+
+          const newLast = state.playerPaths[pipe.id][state.playerPaths[pipe.id].length - 1];
+          const snappedCleanly = sameCell(newLast, candidate.endpoint) && validPlayerPath(state.playerPaths[pipe.id]).ok;
+          if (snappedCleanly) return true;
+          state.playerPaths[pipe.id] = beforeSnap;
+        }
+
+        return false;
+      }
+
+      function handlePointerDown(event) {
+        if (!state.level || state.gameWon || state.animating || $('settings-modal').classList.contains('active')) return;
+        if (!state.cellSize) resizeCanvas();
+        event.preventDefault();
+        const cell = cellFromEvent(event);
+        state.moveTrackedThisStroke = false;
+        state.lastPointerCell = cell;
+
+        const endpointPipe = pipeAtEndpoint(cell);
+        const existing = pipeAtPlayerCell(cell);
+        if (!endpointPipe && !existing) return;
+
+        saveUndo();
+        state.drawing = true;
+        state.activePointerId = event.pointerId;
+        state.activePipeId = endpointPipe ? endpointPipe.id : existing.pipe.id;
+        canvas.setPointerCapture?.(event.pointerId);
+
+        if (endpointPipe) state.playerPaths[endpointPipe.id] = [cell];
+        else state.playerPaths[existing.pipe.id] = state.playerPaths[existing.pipe.id].slice(0, existing.idx + 1);
+
+        updateMetrics();
+        drawBoard();
+      }
+
+      function handlePointerMove(event) {
+        if (!state.drawing || state.activePointerId !== event.pointerId || state.animating) return;
+        event.preventDefault();
+        const pipe = state.level.pipes.find(p => p.id === state.activePipeId);
+        if (!pipe) return;
+        const target = cellFromEvent(event);
+        const path = state.playerPaths[pipe.id];
+        const last = path[path.length - 1];
+        if (!last || sameCell(last, target)) return;
+
+        const selfIdx = path.findIndex(p => sameCell(p, target));
+        if (selfIdx !== -1) {
+          if (!state.moveTrackedThisStroke) {
+            startTimerIfNeeded();
+            state.stats.moves++;
+            state.moveTrackedThisStroke = true;
+          }
+          state.playerPaths[pipe.id] = path.slice(0, selfIdx + 1);
+          updateMetrics();
+          drawBoard();
+          return;
+        }
+
+        if (path.length > 1 && isOwnEndpoint(last, pipe)) return;
+
+        const route = routeBetween(last, target, pipe.id);
+        if (!route.length) return;
+
+        if (!state.moveTrackedThisStroke) {
+          startTimerIfNeeded();
+          state.stats.moves++;
+          state.moveTrackedThisStroke = true;
+        }
+
+        for (const step of route) {
+          if (!validStep(step, pipe.id)) break;
+          if (state.settings.allowBreaks) trimOtherPathsAt(step, pipe.id);
+          state.playerPaths[pipe.id].push(step);
+          if (isOwnEndpoint(step, pipe)) break;
+        }
+        state.lastPointerCell = target;
+        updateMetrics();
+        drawBoard();
+      }
+
+      function handlePointerUp(event) {
+        if (!state.drawing || state.activePointerId !== event.pointerId) return;
+
+        const pipe = state.level?.pipes.find(p => p.id === state.activePipeId);
+        const snapped = pipe ? trySnapToOwnEndpoint(pipe) : false;
+        if (snapped && !state.moveTrackedThisStroke) {
+          startTimerIfNeeded();
+          state.stats.moves++;
+          state.moveTrackedThisStroke = true;
+        }
+        if (snapped && !state.gameWon) {
+          $('status-text').innerHTML = '<strong>Snap.</strong> Endpoint connection completed.';
+        }
+
+        state.drawing = false;
+        state.activePipeId = null;
+        state.activePointerId = null;
+        state.moveTrackedThisStroke = false;
+        state.lastPointerCell = null;
+        canvas.releasePointerCapture?.(event.pointerId);
+        updateMetrics();
+        drawBoard();
+      }
+
+      function clearPaths(recordReset) {
+        if (!state.level || state.gameWon || state.animating) return;
+        saveUndo();
+        resetPlayerPaths();
+        if (recordReset) state.stats.resets++;
+        updateMetrics();
+        drawBoard();
+        $('status-text').innerHTML = '<strong>Cleared.</strong> Board paths removed.';
+      }
+
+      function resetCurrentLevel() {
+        if (!state.level || state.animating) return;
+        $('win-overlay').classList.remove('active');
+        $('score-label').textContent = 'Final score';
+        $('final-score').textContent = '0';
+        $('new-best').classList.remove('active');
+        state.gameWon = false;
+        clearPaths(true);
+        resetTimer();
+        state.stats = { moves: 0, hints: 0, undos: 0, resets: state.stats.resets + 1 };
+        updateTopStats();
+        updateMetrics();
+        $('status-text').innerHTML = '<strong>Reset.</strong> Same endpoints, fresh timer.';
+      }
+
+      function undo() {
+        if (!state.undoStack.length || state.animating) return;
+        const snap = state.undoStack.pop();
+        state.playerPaths = JSON.parse(snap);
+        state.stats.undos++;
+        if (!state.undoStack.length) $('undo-button').disabled = true;
+        $('win-overlay').classList.remove('active');
+        $('score-label').textContent = 'Final score';
+        $('final-score').textContent = '0';
+        $('new-best').classList.remove('active');
+        state.gameWon = false;
+        updateMetrics();
+        drawBoard();
+        $('status-text').innerHTML = '<strong>Undone.</strong> Previous board state restored.';
+      }
+
+      function removeConflictsWithSolution(pipe) {
+        const solutionCells = new Set(pipe.path.map(keyOf));
+        for (const other of state.level.pipes) {
+          if (other.id === pipe.id) continue;
+          const path = state.playerPaths[other.id] || [];
+          const idx = path.findIndex(pt => solutionCells.has(keyOf(pt)));
+          if (idx !== -1) state.playerPaths[other.id] = path.slice(0, idx);
+        }
+      }
+
+      function chooseHintPipe() {
+        const incompleteDrawn = state.level.pipes.find(pipe => (state.playerPaths[pipe.id] || []).length > 0 && !state.completed[pipe.id]);
+        if (incompleteDrawn) return incompleteDrawn;
+        return state.level.pipes.find(pipe => !state.completed[pipe.id]) || null;
+      }
+
+      function hint() {
+        if (!state.level || state.gameWon || state.animating) return;
+        const pipe = chooseHintPipe();
+        if (!pipe) return;
+        saveUndo();
+        startTimerIfNeeded();
+        state.stats.hints++;
+        removeConflictsWithSolution(pipe);
+        state.animating = true;
+        state.playerPaths[pipe.id] = [];
+        let i = 0;
+        $('status-text').innerHTML = '<strong>Hint.</strong> Solving one pipe.';
+        const step = () => {
+          state.playerPaths[pipe.id].push(pipe.path[i]);
+          i++;
+          updateMetrics();
+          drawBoard();
+          if (i < pipe.path.length) {
+            window.setTimeout(step, 28);
+          } else {
+            state.animating = false;
+            updateMetrics();
             drawBoard();
+          }
+        };
+        step();
+      }
+
+      function populateThemeSelects() {
+        const themeSelect = $('theme-select');
+        themeSelect.innerHTML = '';
+        for (const [value, data] of Object.entries(ThemeCatalog)) {
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = data.label;
+          themeSelect.appendChild(option);
+        }
+        themeSelect.addEventListener('change', () => {
+          populatePaletteSelect(themeSelect.value);
+          populateLookSelect(themeSelect.value);
+        });
+        populatePaletteSelect(state.settings.theme);
+        populateLookSelect(state.settings.theme);
+      }
+
+      function populatePaletteSelect(themeValue) {
+        const paletteSelect = $('palette-select');
+        const theme = ThemeCatalog[themeValue] || ThemeCatalog['theme-plain'];
+        paletteSelect.innerHTML = '';
+        for (const name of Object.keys(theme.palettes)) {
+          const option = document.createElement('option');
+          option.value = name;
+          option.textContent = name;
+          paletteSelect.appendChild(option);
+        }
+      }
+
+      function populateLookSelect(themeValue) {
+        const lookSelect = $('look-select');
+        const looks = currentLooks(themeValue);
+        lookSelect.innerHTML = '';
+        for (const [value, label] of Object.entries(looks)) {
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = label;
+          lookSelect.appendChild(option);
+        }
+      }
+
+      function syncSettingsModal() {
+        $('theme-select').value = state.settings.theme;
+        populatePaletteSelect(state.settings.theme);
+        $('palette-select').value = state.settings.paletteName;
+        if (!$('palette-select').value) $('palette-select').selectedIndex = 0;
+        populateLookSelect(state.settings.theme);
+        $('look-select').value = state.settings.look || firstLook(state.settings.theme);
+        if (!$('look-select').value) $('look-select').selectedIndex = 0;
+        $('grid-size-select').value = String(state.settings.size);
+        $('difficulty-select').value = state.settings.difficulty;
+        $('generator-select').value = state.settings.generator;
+        $('breaks-select').value = String(state.settings.allowBreaks);
+        $('input-assist-range').value = String(state.settings.inputAssist ?? 75);
+        $('input-assist-value').textContent = `${state.settings.inputAssist ?? 75}%`;
+      }
+
+      function openSettings() {
+        syncSettingsModal();
+        $('settings-modal').classList.add('active');
+      }
+
+      function closeSettings() {
+        $('settings-modal').classList.remove('active');
+      }
+
+      function applySettings() {
+        const next = {
+          theme: $('theme-select').value,
+          paletteName: $('palette-select').value,
+          look: $('look-select').value || firstLook($('theme-select').value),
+          size: parseInt($('grid-size-select').value, 10),
+          difficulty: $('difficulty-select').value,
+          generator: $('generator-select').value,
+          allowBreaks: $('breaks-select').value === 'true',
+          inputAssist: parseInt($('input-assist-range').value, 10)
+        };
+        const needsNewLevel = next.size !== state.settings.size || next.difficulty !== state.settings.difficulty || next.generator !== state.settings.generator || next.paletteName !== state.settings.paletteName;
+        const themeChanged = next.theme !== state.settings.theme;
+        state.settings = next;
+        setTheme(state.settings.theme);
+        closeSettings();
+        updateHighScore();
+        if (needsNewLevel) initGame();
+        else {
+          if (themeChanged && state.level) {
+            const palette = currentPalette();
+            state.level.pipes.forEach((pipe, i) => { pipe.color = palette[i % palette.length]; });
+          }
+          updateLevelLabels();
+          scheduleResize();
+          drawBoard();
+        }
+      }
+
+      function bindEvents() {
+        canvas.addEventListener('pointerdown', handlePointerDown, { passive: false });
+        canvas.addEventListener('pointermove', handlePointerMove, { passive: false });
+        canvas.addEventListener('pointerup', handlePointerUp);
+        canvas.addEventListener('pointercancel', handlePointerUp);
+        canvas.addEventListener('lostpointercapture', () => {
+          state.drawing = false;
+          state.activePipeId = null;
+          state.activePointerId = null;
         });
 
-        populatePalettes();
+        $('new-button').addEventListener('click', initGame);
+        $('close-win-button').addEventListener('click', () => $('win-overlay').classList.remove('active'));
+        $('next-button').addEventListener('click', initGame);
+        $('clear-button').addEventListener('click', () => clearPaths(false));
+        $('reset-button').addEventListener('click', resetCurrentLevel);
+        $('undo-button').addEventListener('click', undo);
+        $('hint-button').addEventListener('click', hint);
+        $('input-assist-range').addEventListener('input', () => {
+          $('input-assist-value').textContent = `${$('input-assist-range').value}%`;
+        });
+        $('settings-button').addEventListener('click', openSettings);
+        $('close-settings-button').addEventListener('click', closeSettings);
+        $('cancel-settings-button').addEventListener('click', closeSettings);
+        $('apply-settings-button').addEventListener('click', applySettings);
+        $('settings-modal').addEventListener('click', (event) => {
+          if (event.target === $('settings-modal')) closeSettings();
+        });
+        window.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') closeSettings();
+          if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+            event.preventDefault();
+            undo();
+          }
+        });
 
-        /* =========================================
-           PWA INJECTION
-           ========================================= */
-        const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#1e1e1e"/><path d="M170 170 a 40 40 0 1 0 1 0 M170 342 a 40 40 0 1 0 1 0 M342 170 a 40 40 0 1 0 1 0 M342 342 a 40 40 0 1 0 1 0" stroke="#333" stroke-width="40" fill="none" stroke-linecap="round"/><path d="M170 170 L 170 342 M342 170 L 342 342" stroke="#007AFF" stroke-width="32" fill="none" stroke-linecap="round"/><circle cx="170" cy="170" r="15" fill="#fff"/><circle cx="170" cy="342" r="15" fill="#fff"/><circle cx="342" cy="170" r="15" fill="#fff"/><circle cx="342" cy="342" r="15" fill="#fff"/></svg>`;
-        const iconDataURI = `data:image/svg+xml;base64,${btoa(svgIcon)}`;
-        document.getElementById('manifest-link').href = `data:application/manifest+json;charset=utf-8,${encodeURIComponent(JSON.stringify({
-            name: "Flow Forge", short_name: "FlowForge", display: "standalone", background_color: "#1e1e1e", theme_color: "#1e1e1e",
-            icons: [{ src: iconDataURI, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }]
-        }))}`;
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register(URL.createObjectURL(new Blob([`self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));`], { type: 'application/javascript' }))).catch(()=>{});
-        }
-        let deferredPrompt; const installBtn = document.getElementById('btn-install');
-        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.classList.add('visible'); });
-        installBtn.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; installBtn.classList.remove('visible'); deferredPrompt = null; } });
+        const ro = new ResizeObserver(scheduleResize);
+        ro.observe(wrap);
+        window.addEventListener('orientationchange', () => requestAnimationFrame(scheduleResize));
+        window.addEventListener('resize', scheduleResize);
+      }
 
-        /* =========================================
-           SCORING & LOGIC
-           ========================================= */
-        let startTime = 0; let timerInterval = null; let movesCount = 0;
-        function formatTime(ms) { let s = Math.floor(ms / 1000); let m = Math.floor(s / 60); return `${m}:${(s%60).toString().padStart(2, '0')}`; }
-        function startTimer() { clearInterval(timerInterval); startTime = Date.now(); movesCount = 0; document.getElementById('moves-display').textContent = movesCount; timerInterval = setInterval(() => { document.getElementById('timer-display').textContent = formatTime(Date.now() - startTime); }, 1000); }
-        function incrementMove() { movesCount++; document.getElementById('moves-display').textContent = movesCount; }
-        function getHighScoreKey() { return `ff_score_v3_${document.getElementById('grid-size').value}_${document.getElementById('difficulty').value}`; }
-        
-        function calculateScore() {
-            clearInterval(timerInterval);
-            const timeTakenSecs = Math.floor((Date.now() - startTime) / 1000);
-            const minMoves = level.solution.length; const size = level.width;
-            const diffMult = document.getElementById('difficulty').value === 'hard' ? 1.5 : (document.getElementById('difficulty').value === 'easy' ? 0.75 : 1.0);
-            let baseScore = size * size * 100 * diffMult;
-            let finalScore = Math.floor(Math.max(10, baseScore - (Math.max(0, movesCount - minMoves) * 50) - (timeTakenSecs * 10)));
-            
-            const hsKey = getHighScoreKey(); let currentHS = parseInt(localStorage.getItem(hsKey) || '0');
-            const stamp = document.getElementById('new-highscore-stamp');
-            if (finalScore > currentHS) { localStorage.setItem(hsKey, finalScore); stamp.style.display = 'block'; updateHighScoreDisplay(); } 
-            else { stamp.style.display = 'none'; }
-            document.getElementById('win-score-display').textContent = `Score: ${finalScore}`;
-        }
-        function updateHighScoreDisplay() { document.getElementById('metric-highscore').textContent = localStorage.getItem(getHighScoreKey()) || '0'; }
-
-        class LevelGenerator {
-            constructor(w, h, c) { this.W = w; this.H = h; this.targetColors = c; }
-            generate() {
-                let bestBoard = null; let bestCoverage = 0;
-                for (let attempt = 0; attempt < 30; attempt++) {
-                    const grid = []; const paths = new Map(); let pathIdCtr = 0;
-                    for (let y = 0; y < this.H; y++) { grid[y] = []; for (let x = 0; x < this.W; x++) { let id = pathIdCtr++; let cell = { x, y, id, edges: [] }; grid[y][x] = cell; paths.set(id, [cell]); } }
-                    const getGridNeighbors = (c) => { let n = []; if(c.y>0) n.push(grid[c.y-1][c.x]); if(c.y<this.H-1) n.push(grid[c.y+1][c.x]); if(c.x>0) n.push(grid[c.y][c.x-1]); if(c.x<this.W-1) n.push(grid[c.y][c.x+1]); return n; };
-                    const isValidPath = (cells) => { let cellSet = new Set(cells); let totalEdges = 0; for(let c of cells){ totalEdges += c.edges.length; let gridNeighborsInPath = 0; for (let n of getGridNeighbors(c)) if (cellSet.has(n)) gridNeighborsInPath++; if (gridNeighborsInPath !== c.edges.length) return false; } return (totalEdges / 2 === cells.length - 1); };
-                    const splitPath = (startCell, ignoreEdgeTo) => { let visited = []; let q = [startCell]; let visitedSet = new Set([startCell]); while(q.length>0){ let curr = q.shift(); visited.push(curr); for(let next of curr.edges){ if(curr===startCell && next===ignoreEdgeTo) continue; if(!visitedSet.has(next)){ visitedSet.add(next); q.push(next); } } } return visited; };
-
-                    let iters = 0;
-                    while (iters++ < 15000) {
-                        if (paths.size <= this.targetColors) { let allGood = true; for (let p of paths.values()) if (p.length < 3) allGood = false; if (allGood) break; }
-                        let endpoints = []; for (let p of paths.values()) for (let c of p) if (c.edges.length <= 1) endpoints.push(c);
-                        if (endpoints.length === 0) break; 
-                        let C = endpoints[Math.floor(Math.random() * endpoints.length)];
-                        let neighbors = getGridNeighbors(C).filter(n => !C.edges.includes(n));
-                        if (neighbors.length === 0) continue;
-                        let N = neighbors[Math.floor(Math.random() * neighbors.length)];
-                        if (N.edges.length <= 1) {
-                            if (C.id === N.id) continue;
-                            let pathC = paths.get(C.id), pathN = paths.get(N.id); C.edges.push(N); N.edges.push(C);
-                            let newCells = pathC.concat(pathN);
-                            if (isValidPath(newCells)) { let newId = pathIdCtr++, oldCid = C.id, oldNid = N.id; for (let cell of newCells) cell.id = newId; paths.delete(oldCid); paths.delete(oldNid); paths.set(newId, newCells); } 
-                            else { C.edges.pop(); N.edges.pop(); }
-                        } else {
-                            if (paths.size > this.targetColors && Math.random() > 0.6) continue;
-                            let N2 = N.edges[Math.floor(Math.random() * N.edges.length)];
-                            C.edges.push(N); let idxN = N.edges.indexOf(N2); N.edges[idxN] = C; let idxN2 = N2.edges.indexOf(N); N2.edges.splice(idxN2, 1);
-                            let newPath1 = splitPath(C, null);
-                            if (isValidPath(newPath1)) {
-                                let newPath2 = splitPath(N2, null), oldCid = C.id, oldNid = N.id; paths.delete(oldCid); if (paths.has(oldNid)) paths.delete(oldNid);
-                                let newId1 = pathIdCtr++; for(let cell of newPath1) cell.id = newId1; paths.set(newId1, newPath1);
-                                let newId2 = pathIdCtr++; for(let cell of newPath2) cell.id = newId2; paths.set(newId2, newPath2);
-                            } else { C.edges.pop(); N.edges[idxN] = N2; N2.edges.push(N); }
-                        }
-                    }
-                    let topPaths = Array.from(paths.values()).sort((a,b) => b.length - a.length).slice(0, this.targetColors);
-                    let coverage = topPaths.reduce((sum, p) => sum + p.length, 0);
-                    if (coverage > bestCoverage && topPaths.length === this.targetColors) { bestCoverage = coverage; bestBoard = topPaths; if (coverage === this.W * this.H) break; }
-                }
-
-                const levelData = { width: this.W, height: this.H, solution: [] };
-                for (let i = 0; i < bestBoard.length; i++) {
-                    let endpoints = bestBoard[i].filter(c => c.edges.length <= 1); if (endpoints.length !== 2) endpoints = [bestBoard[i][0], bestBoard[i][bestBoard[i].length-1]]; 
-                    let seq = [], curr = endpoints[0], prev = null;
-                    while (curr) { seq.push({x: curr.x, y: curr.y}); let next = curr.edges.find(e => e !== prev); if (!next) break; prev = curr; curr = next; }
-                    levelData.solution.push({ color: currentPalette[i % currentPalette.length], path: seq });
-                }
-                return levelData;
-            }
-        }
-
-        const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d', { alpha: true });
-        const winOverlay = document.getElementById('win-overlay'); const btnUndo = document.getElementById('btn-undo');
-        
-        let level = null; let playerPaths = {}; let completedPaths = {};
-        let cellSize = 0; let isDrawing = false; let currentDrawColor = null; let undoStack = []; let moveTrackedThisStroke = false;
-
-        window.addEventListener('resize', () => { canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientWidth; if (level) { cellSize = canvas.width / level.width; drawBoard(); } });
-
-        function saveState() {
-            const stateStr = JSON.stringify(playerPaths); if (undoStack.length > 0 && undoStack[undoStack.length - 1] === stateStr) return;
-            undoStack.push(stateStr); if (undoStack.length > 50) undoStack.shift(); btnUndo.classList.remove('disabled');
-        }
-
-        function triggerUndo() {
-            if (undoStack.length === 0) return; playerPaths = JSON.parse(undoStack.pop());
-            if (undoStack.length === 0) btnUndo.classList.add('disabled');
-            winOverlay.classList.remove('active'); incrementMove(); updateMetrics(); drawBoard();
-        }
-
-        function initGame() {
-            winOverlay.classList.remove('active');
-            const size = parseInt(document.getElementById('grid-size').value);
-            let numColors = Math.floor(size * (document.getElementById('difficulty').value === 'hard' ? 1.0 : (document.getElementById('difficulty').value === 'easy' ? 0.6 : 0.8)));
-            level = new LevelGenerator(size, size, Math.max(3, Math.min(numColors, currentPalette.length))).generate();
-            undoStack = []; btnUndo.classList.add('disabled'); updateHighScoreDisplay(); startTimer(); resetPaths(false); window.dispatchEvent(new Event('resize'));
-        }
-
-        function resetPaths(recordMove = true) {
-            if (recordMove) { saveState(); incrementMove(); } playerPaths = {}; completedPaths = {};
-            level.solution.forEach(s => { playerPaths[s.color] = []; completedPaths[s.color] = false; }); updateMetrics(); drawBoard();
-        }
-
-        function updateMetrics() {
-            if (!level) return; let connectedCount = 0; let cellsFilled = 0;
-            for (let s of level.solution) {
-                cellsFilled += playerPaths[s.color].length; completedPaths[s.color] = false;
-                if (playerPaths[s.color].length >= 2) {
-                    const pStart = playerPaths[s.color][0], pEnd = playerPaths[s.color][playerPaths[s.color].length - 1], sStart = s.path[0], sEnd = s.path[s.path.length - 1];
-                    if ((pStart.x === sStart.x && pStart.y === sStart.y && pEnd.x === sEnd.x && pEnd.y === sEnd.y) || (pStart.x === sEnd.x && pStart.y === sEnd.y && pEnd.x === sStart.x && pEnd.y === sStart.y)) { connectedCount++; completedPaths[s.color] = true; }
-                }
-            }
-            document.getElementById('metric-pipes').textContent = `${connectedCount}/${level.solution.length}`;
-            const percentage = Math.round((cellsFilled / (level.width * level.height)) * 100);
-            document.getElementById('metric-coverage').textContent = `${percentage}%`;
-            if (connectedCount === level.solution.length && percentage === 100) { calculateScore(); winOverlay.classList.add('active'); }
-        }
-
-        function triggerHint() {
-            if (!level || winOverlay.classList.contains('active')) return;
-            let targetColor = level.solution.find(s => playerPaths[s.color].length > 0 && !completedPaths[s.color])?.color || level.solution.find(s => playerPaths[s.color].length !== s.path.length || !playerPaths[s.color].every((c,i)=>c.x===s.path[i].x && c.y===s.path[i].y) && !playerPaths[s.color].every((c,i)=>c.x===s.path[s.path.length-1-i].x && c.y===s.path[s.path.length-1-i].y))?.color;
-            if (targetColor) {
-                saveState(); incrementMove(); const sol = level.solution.find(s => s.color === targetColor);
-                for (let c in playerPaths) { if (c === targetColor) continue; let colIdx = playerPaths[c].findIndex(pt => sol.path.some(sPt => sPt.x === pt.x && sPt.y === pt.y)); if (colIdx !== -1) playerPaths[c] = playerPaths[c].slice(0, colIdx); }
-                playerPaths[targetColor] = JSON.parse(JSON.stringify(sol.path)); updateMetrics(); drawBoard();
-            }
-        }
-
-        /* --- OVERHAULED THEME RENDERER --- */
-        function drawBoard() {
-            if (!level || cellSize === 0) return;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Let CSS Backgrounds show through when transparent
-
-            const isRetro = currentTheme === 'theme-retro'; const isCyber = currentTheme === 'theme-cyberpunk';
-            const is3D = currentTheme === 'theme-3d'; const isMed = currentTheme === 'theme-medieval'; const isVapor = currentTheme === 'theme-vaporwave';
-
-            // Draw Background Grids
-            ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--grid-line-color').trim();
-            ctx.lineWidth = isRetro ? 2 : 1;
-            
-            if (isMed) {
-                // No drawn squares, just let the wood grain show
-            } else if (!isVapor) {
-                for (let y = 0; y < level.height; y++) for (let x = 0; x < level.width; x++) {
-                    ctx.beginPath();
-                    if(is3D || isCyber) { if(ctx.roundRect) ctx.roundRect(x*cellSize+2, y*cellSize+2, cellSize-4, cellSize-4, 8); else ctx.rect(x*cellSize+2, y*cellSize+2, cellSize-4, cellSize-4); }
-                    else ctx.rect(x*cellSize, y*cellSize, cellSize, cellSize);
-                    ctx.stroke();
-                }
-            }
-
-            const pathWidth = cellSize * (isRetro ? 0.45 : (isVapor ? 0.6 : 0.4));
-            const dotRadius = cellSize * (isRetro ? 0.35 : (isVapor ? 0.4 : 0.32));
-            ctx.lineCap = isRetro ? 'square' : 'round'; ctx.lineJoin = isRetro ? 'miter' : 'round';
-
-            // Render Function for Paths
-            const renderPath = (color, path, connected) => {
-                if (path.length < 2) return;
-                
-                if (isMed) {
-                    // Tavern Yarn Style
-                    // 1. Drop shadow
-                    ctx.beginPath(); ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = pathWidth + 4;
-                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2 + 4; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-                    ctx.stroke();
-                    // 2. Base Wool Color
-                    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = pathWidth;
-                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-                    ctx.stroke();
-                    // 3. Yarn Twine Texture
-                    ctx.beginPath(); ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = pathWidth; ctx.setLineDash([4, 4]);
-                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-                    ctx.stroke(); ctx.setLineDash([]);
-                    
-                } else if (is3D) {
-                    // High-Gloss 3D Glass/Chrome Style
-                    // 1. Dark Base / Bevel
-                    ctx.beginPath(); ctx.strokeStyle = '#111'; ctx.lineWidth = pathWidth + 6;
-                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2 + 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-                    ctx.stroke();
-                    // 2. Base Color
-                    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = pathWidth;
-                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-                    ctx.stroke();
-                    // 3. Specular Highlight Center
-                    ctx.beginPath(); ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = pathWidth * 0.4;
-                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-                    ctx.stroke();
-                    // 4. Tight Specular
-                    ctx.beginPath(); ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = pathWidth * 0.15;
-                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-                    ctx.stroke();
-
-                } else if (isCyber) {
-                    // Cyberpunk Neon Style
-                    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = pathWidth + 2; ctx.shadowColor = color; ctx.shadowBlur = 20;
-                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-                    ctx.stroke(); ctx.shadowBlur = 0;
-                    
-                    ctx.beginPath(); ctx.strokeStyle = '#fff'; ctx.lineWidth = pathWidth * 0.3;
-                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-                    ctx.stroke();
-
-                } else if (isVapor) {
-                    // Vaporwave Pastel Tubing Style
-                    ctx.beginPath(); ctx.strokeStyle = '#fff'; ctx.lineWidth = pathWidth + 8;
-                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-                    ctx.stroke();
-                    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = pathWidth;
-                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-                    ctx.stroke();
-                    if(connected) {
-                        ctx.beginPath(); ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = pathWidth * 0.5;
-                        for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
-                        ctx.stroke();
-                    }
-
-                } else if (isRetro) {
-                    // Retro Arcade Style
-                    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = pathWidth;
-                    for (let i = 0; i < path.length - 1; i++) {
-                        const px1 = path[i].x * cellSize + cellSize/2, py1 = path[i].y * cellSize + cellSize/2;
-                        const px2 = path[i+1].x * cellSize + cellSize/2, py2 = path[i+1].y * cellSize + cellSize/2;
-                        ctx.moveTo(px1, py1); ctx.lineTo(px2, py2);
-                    }
-                    ctx.stroke();
-                    if (connected) {
-                        ctx.beginPath(); ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = pathWidth * 0.3;
-                        for (let i = 0; i < path.length - 1; i++) {
-                            const px1 = path[i].x * cellSize + cellSize/2, py1 = path[i].y * cellSize + cellSize/2;
-                            const px2 = path[i+1].x * cellSize + cellSize/2, py2 = path[i+1].y * cellSize + cellSize/2;
-                            ctx.moveTo(px1, py1); ctx.lineTo(px2, py2);
-                        }
-                        ctx.stroke();
-                    }
-                }
-            };
-
-            for (let color in playerPaths) renderPath(color, playerPaths[color], completedPaths[color]);
-
-            // Endpoints
-            for (let s of level.solution) {
-                const cx = s.path[0].x * cellSize + cellSize / 2, cy = s.path[0].y * cellSize + cellSize / 2;
-                const cx2 = s.path[s.path.length-1].x * cellSize + cellSize / 2, cy2 = s.path[s.path.length-1].y * cellSize + cellSize / 2;
-                const conn = completedPaths[s.color];
-
-                const drawEndpoint = (x, y) => {
-                    if (isRetro) {
-                        ctx.fillStyle = s.color; ctx.fillRect(x - dotRadius, y - dotRadius, dotRadius*2, dotRadius*2);
-                        if(conn) { ctx.fillStyle='#fff'; ctx.fillRect(x - dotRadius/3, y - dotRadius/3, (dotRadius/3)*2, (dotRadius/3)*2); }
-                    } else if (isMed) {
-                        // Iron Nail / Wooden Peg
-                        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.beginPath(); ctx.arc(x, y+3, dotRadius, 0, Math.PI * 2); ctx.fill(); // Shadow
-                        ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(x, y, dotRadius, 0, Math.PI * 2); ctx.fill(); // Base metal
-                        ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(x, y, dotRadius * 0.7, 0, Math.PI * 2); ctx.fill(); // Color inset
-                        ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.beginPath(); ctx.arc(x - 2, y - 2, dotRadius * 0.2, 0, Math.PI * 2); ctx.fill(); // Highlight
-                    } else if (is3D) {
-                        ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.beginPath(); ctx.arc(x, y+3, dotRadius+2, 0, Math.PI*2); ctx.fill();
-                        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(x, y, dotRadius+2, 0, Math.PI * 2); ctx.fill();
-                        ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(x, y, dotRadius*0.9, 0, Math.PI * 2); ctx.fill();
-                        ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.arc(x-2, y-2, dotRadius * 0.4, 0, Math.PI * 2); ctx.fill();
-                    } else if (isCyber) {
-                        ctx.shadowColor = s.color; ctx.shadowBlur = 15;
-                        ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(x, y, dotRadius + 1, 0, Math.PI * 2); ctx.fill();
-                        ctx.shadowBlur = 0; ctx.fillStyle = '#05050a'; ctx.beginPath(); ctx.arc(x, y, dotRadius * 0.7, 0, Math.PI * 2); ctx.fill();
-                        ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(x, y, dotRadius * 0.4, 0, Math.PI * 2); ctx.fill();
-                        if (conn) { ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y, dotRadius * 0.2, 0, Math.PI * 2); ctx.fill(); }
-                    } else if (isVapor) {
-                        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y, dotRadius + 4, 0, Math.PI * 2); ctx.fill();
-                        ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(x, y, dotRadius, 0, Math.PI * 2); ctx.fill();
-                        if (conn) { ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.beginPath(); ctx.arc(x, y, dotRadius * 0.5, 0, Math.PI * 2); ctx.fill(); }
-                    }
-                };
-                drawEndpoint(cx, cy); drawEndpoint(cx2, cy2);
-            }
-        }
-
-        /* --- INPUT --- */
-        function getCellFromEvent(e) {
-            const rect = canvas.getBoundingClientRect(), cx = e.touches ? e.touches[0].clientX : e.clientX, cy = e.touches ? e.touches[0].clientY : e.clientY;
-            return { x: Math.max(0, Math.min(level.width - 1, Math.floor((cx - rect.left) / cellSize))), y: Math.max(0, Math.min(level.height - 1, Math.floor((cy - rect.top) / cellSize))) };
-        }
-        function isCellValid(x, y, color) {
-            if (x < 0 || x >= level.width || y < 0 || y >= level.height) return false;
-            if (level.solution.some(s => s.color !== color && ((x === s.path[0].x && y === s.path[0].y) || (x === s.path[s.path.length-1].x && y === s.path[s.path.length-1].y)))) return false;
-            if (document.getElementById('allow-break').value === 'false' && Object.keys(playerPaths).some(c => c !== color && playerPaths[c].some(pt => pt.x === x && pt.y === y))) return false;
-            return !playerPaths[color].some(pt => pt.x === x && pt.y === y);
-        }
-        function findPathTo(sx, sy, tx, ty, color) {
-            let q = [{x: sx, y: sy, route: []}], vis = new Set([`${sx},${sy}`]), best = [], minD = Math.abs(sx-tx)+Math.abs(sy-ty);
-            while(q.length > 0) {
-                let curr = q.shift(), d = Math.abs(curr.x-tx)+Math.abs(curr.y-ty);
-                if(d < minD) { minD = d; best = curr.route; } else if(d === minD && curr.route.length < best.length) best = curr.route;
-                if(curr.x === tx && curr.y === ty) return curr.route;
-                [{x:curr.x+1,y:curr.y}, {x:curr.x-1,y:curr.y}, {x:curr.x,y:curr.y+1}, {x:curr.x,y:curr.y-1}].forEach(n => {
-                    if(!vis.has(`${n.x},${n.y}`) && isCellValid(n.x, n.y, color)) { vis.add(`${n.x},${n.y}`); q.push({x:n.x, y:n.y, route:[...curr.route, {x:n.x, y:n.y}]}); }
-                });
-            } return best;
-        }
-
-        function handleDown(e) {
-            if (winOverlay.classList.contains('active') || document.getElementById('settings-modal').classList.contains('active')) return;
-            const c = getCellFromEvent(e); moveTrackedThisStroke = false;
-            for (let s of level.solution) {
-                if ((c.x === s.path[0].x && c.y === s.path[0].y) || (c.x === s.path[s.path.length-1].x && c.y === s.path[s.path.length-1].y)) {
-                    saveState(); isDrawing = true; currentDrawColor = s.color; playerPaths[s.color] = [c]; updateMetrics(); drawBoard(); return;
-                }
-            }
-            for (let clr in playerPaths) {
-                const idx = playerPaths[clr].findIndex(p => p.x === c.x && p.y === c.y);
-                if (idx !== -1) { saveState(); isDrawing = true; currentDrawColor = clr; playerPaths[clr] = playerPaths[clr].slice(0, idx + 1); updateMetrics(); drawBoard(); return; }
-            }
-        }
-
-        function handleMove(e) {
-            if (!isDrawing || !currentDrawColor) return; if (e.cancelable) e.preventDefault();
-            const c = getCellFromEvent(e), path = playerPaths[currentDrawColor], lc = path[path.length - 1];
-            if (c.x === lc.x && c.y === lc.y) return;
-            if (!moveTrackedThisStroke) { incrementMove(); moveTrackedThisStroke = true; }
-
-            const selfIdx = path.findIndex(p => p.x === c.x && p.y === c.y);
-            if (selfIdx !== -1) { playerPaths[currentDrawColor] = path.slice(0, selfIdx + 1); updateMetrics(); drawBoard(); return; }
-
-            const sol = level.solution.find(s => s.color === currentDrawColor);
-            if (path.length > 1 && ((lc.x === sol.path[0].x && lc.y === sol.path[0].y) || (lc.x === sol.path[sol.path.length-1].x && lc.y === sol.path[sol.path.length-1].y))) return;
-
-            const route = findPathTo(lc.x, lc.y, c.x, c.y, currentDrawColor);
-            if (route.length > 0) {
-                for (let step of route) {
-                    if (document.getElementById('allow-break').value === 'true') {
-                        for (let clr in playerPaths) { if (clr === currentDrawColor) continue; const colIdx = playerPaths[clr].findIndex(p => p.x === step.x && p.y === step.y); if (colIdx !== -1) playerPaths[clr] = playerPaths[clr].slice(0, colIdx); }
-                    }
-                    path.push(step);
-                    if ((step.x === sol.path[0].x && step.y === sol.path[0].y) || (step.x === sol.path[sol.path.length-1].x && step.y === sol.path[sol.path.length-1].y)) break;
-                }
-                updateMetrics(); drawBoard();
-            }
-        }
-
-        function handleUp() { if (isDrawing) { isDrawing = false; currentDrawColor = null; updateMetrics(); drawBoard(); } }
-
-        canvas.addEventListener('mousedown', handleDown); window.addEventListener('mousemove', handleMove); window.addEventListener('mouseup', handleUp);
-        canvas.addEventListener('touchstart', handleDown, {passive: false}); window.addEventListener('touchmove', handleMove, {passive: false}); window.addEventListener('touchend', handleUp);
-
-        document.getElementById('btn-settings').addEventListener('click', () => document.getElementById('settings-modal').classList.add('active'));
-        document.getElementById('btn-close-settings').addEventListener('click', () => { document.getElementById('settings-modal').classList.remove('active'); updateHighScoreDisplay(); });
-        document.getElementById('btn-new').addEventListener('click', initGame); document.getElementById('btn-reset').addEventListener('click', () => resetPaths(true));
-        document.getElementById('btn-hint').addEventListener('click', triggerHint); document.getElementById('btn-undo').addEventListener('click', triggerUndo);
-        document.getElementById('btn-next').addEventListener('click', initGame); document.getElementById('grid-size').addEventListener('change', initGame); document.getElementById('difficulty').addEventListener('change', initGame);
-
+      function boot() {
+        populateThemeSelects();
+        setTheme(state.settings.theme);
+        bindEvents();
         initGame();
-    </script>
+      }
+
+      boot();
+    })();
+  </script>
 </body>
 </html>
