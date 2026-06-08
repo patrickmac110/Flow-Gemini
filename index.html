@@ -17,182 +17,134 @@
             --border-color: #2a2a35; --accent-color: #4a90e2;
             --font-family: 'Segoe UI', system-ui, sans-serif;
             --header-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            --canvas-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 0 1px #222;
-            --canvas-bg: #0b0b0e; --grid-line-color: #1b1b22;
-            --btn-text: #fff;
+            --canvas-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            --canvas-bg: #0b0b0e; --btn-text: #fff;
         }
 
         /* --- THEME: CYBERPUNK NEON --- */
         body.theme-cyberpunk {
-            --bg-color: #020205; --panel-bg: rgba(10, 10, 20, 0.85); --text-color: #0ff;
-            --border-color: #0ff; --accent-color: #f0f;
+            --bg-color: #020205; --panel-bg: rgba(8, 8, 15, 0.9); --text-color: #0ff;
+            --border-color: #f0f; --accent-color: #0ff;
             --font-family: 'Orbitron', sans-serif;
-            --header-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-            --canvas-shadow: 0 0 40px rgba(255, 0, 255, 0.2), inset 0 0 20px #0ff;
-            --canvas-bg: #05050a; --grid-line-color: #0a1520; --btn-text: #020205;
-            background-image: 
-                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 30px 30px;
+            --header-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+            --canvas-shadow: 0 0 40px rgba(0, 255, 255, 0.2), inset 0 0 20px rgba(255, 0, 255, 0.2);
+            --canvas-bg: #05050a; --btn-text: #020205;
+            background-image: linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
-        body.theme-cyberpunk * { text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); }
-        body.theme-cyberpunk button.primary { box-shadow: 0 0 15px var(--accent-color); text-shadow: none; font-weight: 800; }
+        body.theme-cyberpunk * { text-shadow: 0 0 4px rgba(0, 255, 255, 0.4); }
+        body.theme-cyberpunk button.primary { box-shadow: 0 0 15px var(--accent-color); font-weight: 800; border: 2px solid #fff; }
+        body.theme-cyberpunk .metrics { border: 1px solid #0ff; }
 
         /* --- THEME: VAPORWAVE --- */
         body.theme-vaporwave {
-            --bg-color: #ff99cc; --panel-bg: rgba(255, 255, 255, 0.9); --text-color: #333;
+            --bg-color: #ff99cc; --panel-bg: rgba(255, 255, 255, 0.85); --text-color: #2b1055;
             --border-color: #41f2ff; --accent-color: #ff71ce;
             --font-family: 'Righteous', cursive;
             --header-shadow: 0 8px 32px rgba(255, 113, 206, 0.3);
-            --canvas-shadow: 0 10px 40px rgba(65, 242, 255, 0.5), inset 0 0 0 4px #ff71ce;
-            --canvas-bg: #fff; --grid-line-color: rgba(255, 113, 206, 0.3); --btn-text: #fff;
-            background: linear-gradient(180deg, #2b1055 0%, #7597de 100%);
-            letter-spacing: 2px;
+            --canvas-shadow: 0 15px 40px rgba(43, 16, 85, 0.4), inset 0 0 0 6px #ff71ce;
+            --canvas-bg: rgba(255,255,255,0.8); --btn-text: #fff;
+            background: linear-gradient(180deg, #ff99cc 0%, #7597de 100%);
+            letter-spacing: 1px;
         }
-        body.theme-vaporwave header { background: linear-gradient(90deg, #ff99cc, #99ccff); border-bottom: 4px solid #fff; }
-        body.theme-vaporwave .metrics { background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border: 2px solid #fff; }
-        body.theme-vaporwave h1 { background: none; -webkit-text-fill-color: #fff; text-shadow: 2px 2px 0px #ff71ce, -2px -2px 0px #41f2ff; }
+        body.theme-vaporwave::before {
+            content: ""; position: fixed; bottom: 0; left: 0; width: 100vw; height: 40vh; z-index: -1;
+            background: 
+                linear-gradient(rgba(255, 113, 206, 0.4) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(255, 113, 206, 0.4) 2px, transparent 2px);
+            background-size: 40px 20px, 40px 40px;
+            transform: perspective(500px) rotateX(60deg);
+        }
+        body.theme-vaporwave header { background: linear-gradient(90deg, #41f2ff, #ff71ce); border-bottom: 3px solid #fff; }
+        body.theme-vaporwave h1 { -webkit-text-fill-color: #fff; text-shadow: 2px 2px 0px #ff71ce; background: none; }
+        body.theme-vaporwave .metrics { border: 3px solid #fff; box-shadow: 6px 6px 0px #41f2ff; }
+
+        /* --- THEME: MEDIEVAL TAVERN --- */
+        body.theme-medieval {
+            --bg-color: #3e2723; --panel-bg: #4e342e; --text-color: #d7ccc8;
+            --border-color: #27140c; --accent-color: #ffb300;
+            --font-family: 'Cinzel', serif;
+            --header-shadow: 0 8px 16px rgba(0,0,0,0.8);
+            --canvas-shadow: 0 15px 35px rgba(0,0,0,0.9), inset 0 0 30px rgba(0, 0, 0, 0.6);
+            --canvas-bg: transparent; --btn-text: #3e2723;
+            /* Wood Grain Background */
+            background-color: #4a3022;
+            background-image: 
+                repeating-radial-gradient(circle at 50% 50%, rgba(0,0,0,0.05) 0, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 4px),
+                linear-gradient(90deg, #3e2723, #4e342e, #3e2723);
+        }
+        body.theme-medieval header { background: #27140c; border-bottom: 4px solid #1a0d08; }
+        body.theme-medieval .metrics, body.theme-medieval .modal-content { background: #3e2723; border: 2px solid #1a0d08; box-shadow: inset 0 0 10px #000; }
+        body.theme-medieval h1 { font-size: 24px; -webkit-text-fill-color: #ffb300; text-shadow: 2px 2px 4px #000; font-weight: 900; background: none;}
+        body.theme-medieval select, body.theme-medieval button.action { background: #5d4037; color: #d7ccc8; border: 2px solid #27140c; }
+        body.theme-medieval button.primary { background: #ffb300; color: #3e2723; font-weight: 900; }
+
+        /* --- THEME: 3D HIGH-GLOSS --- */
+        body.theme-3d {
+            --bg-color: #121212; --panel-bg: #1e1e1e; --text-color: #e0e0e0;
+            --border-color: #333; --accent-color: #007AFF;
+            --font-family: system-ui, -apple-system, sans-serif;
+            --canvas-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.05);
+            --canvas-bg: #1a1a1a; --btn-text: #fff;
+            background: radial-gradient(circle at top center, #2a2a2a, #121212);
+        }
+        body.theme-3d button { box-shadow: inset 0 1px 1px rgba(255,255,255,0.3), 0 4px 6px rgba(0,0,0,0.4); border: 1px solid #000; }
+        body.theme-3d button:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); transform: translateY(2px); }
 
         /* --- THEME: 8-BIT RETRO --- */
         body.theme-retro {
-            --bg-color: #111; --panel-bg: #000; --text-color: #3f3;
-            --border-color: #3f3; --accent-color: #ff0000;
+            --bg-color: #000; --panel-bg: #111; --text-color: #fff;
+            --border-color: #444; --accent-color: #ff0000;
             --font-family: 'Press Start 2P', monospace;
             --header-shadow: none; --canvas-shadow: none;
-            --canvas-bg: #000; --grid-line-color: #222; --btn-text: #fff;
+            --canvas-bg: #000; --btn-text: #fff;
             text-transform: uppercase;
         }
         body.theme-retro * { border-radius: 0 !important; font-size: 10px; }
         body.theme-retro header, body.theme-retro .metrics, body.theme-retro .modal-content, body.theme-retro .action-buttons button { 
-            border: 4px solid var(--border-color); box-shadow: 6px 6px 0px rgba(0,255,0,0.2); 
+            border: 4px solid var(--border-color); box-shadow: 4px 4px 0px rgba(255,255,255,0.1); 
         }
-        body.theme-retro canvas { border: 4px solid var(--border-color); }
-        body.theme-retro .metric-value { font-size: 14px; }
-        body.theme-retro h1 { font-size: 16px; -webkit-text-fill-color: #3f3; }
-
-        /* --- THEME: MEDIEVAL PARCHMENT --- */
-        body.theme-medieval {
-            --bg-color: #2c2116; --panel-bg: #e6d8be; --text-color: #3e2723;
-            --border-color: #8d6e63; --accent-color: #8b0000;
-            --font-family: 'Cinzel', serif;
-            --header-shadow: 0 10px 20px rgba(0,0,0,0.6);
-            --canvas-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 60px rgba(141, 110, 99, 0.4);
-            --canvas-bg: #f4e4bc; --grid-line-color: rgba(141, 110, 99, 0.3); --btn-text: #f4e4bc;
-            background-image: radial-gradient(circle at center, #4e3822 0%, #1a120b 100%);
-        }
-        body.theme-medieval header { background-image: linear-gradient(to right, #d4c4a8, #e6d8be, #d4c4a8); border-bottom: 3px solid #5d4037; }
-        body.theme-medieval .metrics, body.theme-medieval .modal-content { background-image: radial-gradient(circle, #f4e4bc, #e6d8be); border: 2px solid #5d4037; }
-        body.theme-medieval h1 { font-size: 24px; -webkit-text-fill-color: #3e2723; text-shadow: 1px 1px 0px rgba(255,255,255,0.5); font-weight: 900; }
-        body.theme-medieval select, body.theme-medieval button.action { background: #d4c4a8; color: #3e2723; border: 1px solid #5d4037; font-weight: bold; }
-        body.theme-medieval button.primary { background: #8b0000; color: #f4e4bc; }
-
-        /* --- THEME: 3D FILAMENT --- */
-        body.theme-3d {
-            --bg-color: #1e272e; --panel-bg: #2f3640; --text-color: #f5f6fa;
-            --border-color: #718093; --accent-color: #e84118;
-            --font-family: system-ui, -apple-system, sans-serif;
-            --canvas-shadow: 15px 20px 30px rgba(0,0,0,0.6), inset 2px 2px 5px rgba(255,255,255,0.05);
-            --canvas-bg: #222f3e; --grid-line-color: #151e27; --btn-text: #fff;
-            background: radial-gradient(circle at top right, #353b48, #1e272e);
-        }
-        body.theme-3d button { box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 4px 6px rgba(0,0,0,0.3); }
-        body.theme-3d button:active { box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); transform: translateY(2px); }
-
+        body.theme-retro canvas { border: 4px solid #444; }
+        body.theme-retro h1 { font-size: 16px; -webkit-text-fill-color: #fff; background: none;}
+        
         /* CRT Overlay for Cyberpunk & Retro */
         .crt-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: 9999; display: none;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; display: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
             background-size: 100% 4px, 6px 100%;
         }
         body.theme-retro .crt-overlay, body.theme-cyberpunk .crt-overlay { display: block; }
         
+        /* Base Structure */
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-
-        body {
-            margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color);
-            font-family: var(--font-family); display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; overflow: hidden; padding-bottom: env(safe-area-inset-bottom);
-            transition: background 0.4s, color 0.4s;
-        }
-
-        header {
-            width: 100%; padding: max(16px, env(safe-area-inset-top)) 20px 16px 20px;
-            background-color: var(--panel-bg); display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border-color); box-shadow: var(--header-shadow); z-index: 10;
-        }
-
+        body { margin: 0; padding: 0; color: var(--text-color); display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow: hidden; padding-bottom: env(safe-area-inset-bottom); transition: background 0.4s, color 0.4s; }
+        header { width: 100%; padding: max(16px, env(safe-area-inset-top)) 20px 16px 20px; background-color: var(--panel-bg); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); box-shadow: var(--header-shadow); z-index: 10; }
         h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; background: linear-gradient(90deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
-        .stats-bar { display: flex; gap: 15px; font-size: 13px; font-weight: bold; opacity: 0.8; align-items: center; }
+        .stats-bar { display: flex; gap: 15px; font-size: 13px; font-weight: bold; opacity: 0.9; align-items: center; }
         .header-controls { display: flex; gap: 10px; align-items: center; }
-
-        .install-btn {
-            background: var(--accent-color); color: var(--btn-text); border: none; padding: 8px 14px; border-radius: 16px;
-            font-size: 11px; font-family: inherit; font-weight: bold; text-transform: uppercase; cursor: pointer; display: none;
-        }
+        .install-btn { background: var(--accent-color); color: var(--btn-text); border: none; padding: 8px 14px; border-radius: 16px; font-size: 11px; font-family: inherit; font-weight: bold; text-transform: uppercase; cursor: pointer; display: none; }
         .install-btn.visible { display: block; }
-
-        .icon-btn {
-            background: none; border: none; color: var(--text-color); cursor: pointer;
-            padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        }
-
-        .container {
-            display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px;
-            padding: 20px; flex-grow: 1; gap: 15px;
-        }
-
-        .metrics {
-            width: 100%; display: flex; justify-content: space-around; background: var(--panel-bg);
-            padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--header-shadow);
-        }
+        .icon-btn { background: none; border: none; color: var(--text-color); cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; padding: 20px; flex-grow: 1; gap: 15px; }
+        .metrics { width: 100%; display: flex; justify-content: space-around; background: var(--panel-bg); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--header-shadow); }
         .metric-item { display: flex; flex-direction: column; align-items: center; }
         .metric-label { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
         .metric-value { font-size: 20px; font-weight: bold; color: var(--accent-color); }
-
-        .canvas-container {
-            position: relative; width: 100%; aspect-ratio: 1 / 1; max-width: 500px;
-            background: var(--canvas-bg); border-radius: 12px; box-shadow: var(--canvas-shadow); touch-action: none;
-        }
+        .canvas-container { position: relative; width: 100%; aspect-ratio: 1 / 1; max-width: 500px; background: var(--canvas-bg); border-radius: 12px; box-shadow: var(--canvas-shadow); touch-action: none; }
         canvas { display: block; width: 100%; height: 100%; border-radius: 12px; }
-
         .action-buttons { display: flex; gap: 10px; width: 100%; max-width: 500px; }
-        button.action {
-            flex: 1; padding: 14px 8px; font-weight: bold; font-size: 12px; font-family: inherit; border: 1px solid var(--border-color);
-            border-radius: 8px; cursor: pointer; background: var(--panel-bg); color: var(--text-color);
-            text-transform: uppercase; display: flex; align-items: center; justify-content: center; letter-spacing: 1px;
-        }
+        button.action { flex: 1; padding: 14px 8px; font-weight: bold; font-size: 12px; font-family: inherit; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; background: var(--panel-bg); color: var(--text-color); text-transform: uppercase; display: flex; align-items: center; justify-content: center; letter-spacing: 1px; }
         button.action.primary { background: var(--accent-color); color: var(--btn-text); border: none; flex: 1.2; }
-
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 100;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 100; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-content {
-            background: var(--panel-bg); width: 90%; max-width: 360px; padding: 24px; border-radius: 16px;
-            border: 1px solid var(--border-color); transform: scale(0.95); transition: transform 0.25s ease;
-        }
+        .modal-content { background: var(--panel-bg); width: 90%; max-width: 360px; padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); transform: scale(0.95); transition: transform 0.25s ease; }
         .modal-overlay.active .modal-content { transform: scale(1); }
         .modal-header { font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
-
         .control-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .control-group label { font-size: 12px; font-weight: bold; text-transform: uppercase; }
-        select {
-            background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);
-            padding: 8px 12px; border-radius: 6px; font-size: 12px; font-family: var(--font-family); min-width: 140px; outline: none;
-        }
-        .btn-full {
-            width: 100%; margin-top: 20px; padding: 14px; background: var(--accent-color); color: var(--btn-text);
-            border: none; border-radius: 8px; font-family: inherit; font-weight: bold; cursor: pointer; text-transform: uppercase;
-        }
-
-        .win-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--panel-bg);
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 10; border-radius: 12px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;
-        }
+        select { background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; font-size: 12px; font-family: var(--font-family); min-width: 140px; outline: none; }
+        .btn-full { width: 100%; margin-top: 20px; padding: 14px; background: var(--accent-color); color: var(--btn-text); border: none; border-radius: 8px; font-family: inherit; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .win-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--panel-bg); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 10; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
         .win-overlay.active { opacity: 0.95; pointer-events: auto; }
         .win-overlay h2 { font-size: 28px; margin-bottom: 10px; color: var(--accent-color); }
         .win-score { font-size: 18px; margin-bottom: 20px; }
@@ -201,7 +153,7 @@
         .disabled { opacity: 0.4; pointer-events: none; }
     </style>
 </head>
-<body class="theme-cyberpunk">
+<body class="theme-3d">
     <div class="crt-overlay"></div>
 
     <header>
@@ -240,7 +192,7 @@
         <div class="canvas-container">
             <canvas id="gameCanvas"></canvas>
             <div class="win-overlay" id="win-overlay">
-                <h2>System Cleared</h2>
+                <h2>Level Cleared</h2>
                 <div class="win-score" id="win-score-display">Score: 0</div>
                 <div class="high-score-stamp" id="new-highscore-stamp" style="display:none;">★ NEW HIGH SCORE ★</div>
                 <button class="action primary" id="btn-next" style="width: 200px; max-width: 90%;">Next Level</button>
@@ -261,11 +213,11 @@
             <div class="control-group">
                 <label>Theme</label>
                 <select id="theme-select">
-                    <option value="theme-cyberpunk" selected>Cyberpunk Neon</option>
-                    <option value="theme-vaporwave">Vaporwave</option>
+                    <option value="theme-3d" selected>3D Glass & Chrome</option>
+                    <option value="theme-medieval">Medieval Tavern</option>
+                    <option value="theme-cyberpunk">Cyberpunk Neon</option>
+                    <option value="theme-vaporwave">Vaporwave Checkers</option>
                     <option value="theme-retro">8-Bit Arcade</option>
-                    <option value="theme-medieval">Medieval Parchment</option>
-                    <option value="theme-3d">3D Filament</option>
                 </select>
             </div>
             <div class="control-group">
@@ -299,6 +251,18 @@
            THEMES & PALETTES
            ========================================= */
         const Themes = {
+            'theme-3d': {
+                palettes: {
+                    'Standard Gloss': ['#FF3B30', '#34C759', '#007AFF', '#FF9500', '#AF52DE', '#FF2D55', '#FFCC00', '#30B0C7', '#8E8E93', '#A2845E'],
+                    'Pastel Glass': ['#FF9AA2', '#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#F1CBFF', '#A0E4CB', '#C4D7E0', '#FFF1CC']
+                }
+            },
+            'theme-medieval': {
+                palettes: {
+                    'Dyed Wool': ['#d32f2f', '#1976d2', '#388e3c', '#fbc02d', '#7b1fa2', '#f57c00', '#00796b', '#c2185b', '#5d4037', '#689f38'],
+                    'Earthy Tones': ['#3e2723', '#4e342e', '#5d4037', '#795548', '#8d6e63', '#424242', '#616161', '#757575', '#827717', '#9e9d24']
+                }
+            },
             'theme-cyberpunk': {
                 palettes: {
                     'Night City': ['#00ffff', '#ff00ff', '#00ff00', '#ffff00', '#ff3300', '#3333ff', '#ff0033', '#00ffcc', '#cc00ff', '#ffffff'],
@@ -313,25 +277,14 @@
             },
             'theme-retro': {
                 palettes: {
-                    'Classic Arcade': ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', '#ff8800', '#88ff00', '#0088ff'],
-                    'GameBoy DMG': ['#8bac0f', '#9bbc0f', '#306230', '#0f380f', '#8bac0f', '#9bbc0f', '#306230', '#0f380f', '#8bac0f', '#9bbc0f']
-                }
-            },
-            'theme-medieval': {
-                palettes: {
-                    'Royal Ink': ['#8b0000', '#000080', '#006400', '#4B0082', '#8B4513', '#5D4037', '#004D40', '#3E2723', '#827717', '#b93232'],
-                    'Alchemist': ['#3e2723', '#4e342e', '#5d4037', '#6d4c41', '#795548', '#8d6e63', '#a1887f', '#bcaaa4', '#d7ccc8', '#efebe9']
-                }
-            },
-            'theme-3d': {
-                palettes: {
-                    'Standard ABS': ['#FF3B30', '#34C759', '#007AFF', '#FF9500', '#AF52DE', '#FF2D55', '#FFCC00', '#30B0C7', '#8E8E93', '#A2845E'],
-                    'Silk PLA': ['#FF9AA2', '#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#F1CBFF', '#A0E4CB', '#C4D7E0', '#FFF1CC']
+                    'Arcade CRT': ['#ff0000', '#00ff00', '#0044ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff', '#ff8800', '#ff0088', '#00ff88'],
+                    // Replaced broken GameBoy with 10 highly distinct retro green shades to prevent logic merging
+                    'GameBoy DMG (Fixed)': ['#053800', '#0f5900', '#187a00', '#229b00', '#2cbc00', '#41d10e', '#57e826', '#72ff42', '#96ff73', '#baff9e']
                 }
             }
         };
 
-        let currentTheme = 'theme-cyberpunk';
+        let currentTheme = 'theme-3d';
         let currentPalette = Themes[currentTheme].palettes[Object.keys(Themes[currentTheme].palettes)[0]];
 
         function populatePalettes() {
@@ -358,10 +311,10 @@
         /* =========================================
            PWA INJECTION
            ========================================= */
-        const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><circle cx="256" cy="256" r="256" fill="#020205"/><path d="M170 170 a 40 40 0 1 0 1 0 M170 342 a 40 40 0 1 0 1 0 M342 170 a 40 40 0 1 0 1 0 M342 342 a 40 40 0 1 0 1 0" stroke="#00ffff" stroke-width="32" fill="none" stroke-linecap="round"/><path d="M170 170 L 170 342 M342 170 L 342 342" stroke="#f0f" stroke-width="32" fill="none" stroke-linecap="round"/><circle cx="170" cy="170" r="15" fill="#fff"/><circle cx="170" cy="342" r="15" fill="#fff"/><circle cx="342" cy="170" r="15" fill="#fff"/><circle cx="342" cy="342" r="15" fill="#fff"/></svg>`;
+        const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#1e1e1e"/><path d="M170 170 a 40 40 0 1 0 1 0 M170 342 a 40 40 0 1 0 1 0 M342 170 a 40 40 0 1 0 1 0 M342 342 a 40 40 0 1 0 1 0" stroke="#333" stroke-width="40" fill="none" stroke-linecap="round"/><path d="M170 170 L 170 342 M342 170 L 342 342" stroke="#007AFF" stroke-width="32" fill="none" stroke-linecap="round"/><circle cx="170" cy="170" r="15" fill="#fff"/><circle cx="170" cy="342" r="15" fill="#fff"/><circle cx="342" cy="170" r="15" fill="#fff"/><circle cx="342" cy="342" r="15" fill="#fff"/></svg>`;
         const iconDataURI = `data:image/svg+xml;base64,${btoa(svgIcon)}`;
         document.getElementById('manifest-link').href = `data:application/manifest+json;charset=utf-8,${encodeURIComponent(JSON.stringify({
-            name: "Flow Forge", short_name: "FlowForge", display: "standalone", background_color: "#020205", theme_color: "#020205",
+            name: "Flow Forge", short_name: "FlowForge", display: "standalone", background_color: "#1e1e1e", theme_color: "#1e1e1e",
             icons: [{ src: iconDataURI, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }]
         }))}`;
         if ('serviceWorker' in navigator) {
@@ -378,7 +331,7 @@
         function formatTime(ms) { let s = Math.floor(ms / 1000); let m = Math.floor(s / 60); return `${m}:${(s%60).toString().padStart(2, '0')}`; }
         function startTimer() { clearInterval(timerInterval); startTime = Date.now(); movesCount = 0; document.getElementById('moves-display').textContent = movesCount; timerInterval = setInterval(() => { document.getElementById('timer-display').textContent = formatTime(Date.now() - startTime); }, 1000); }
         function incrementMove() { movesCount++; document.getElementById('moves-display').textContent = movesCount; }
-        function getHighScoreKey() { return `ff_score_${document.getElementById('grid-size').value}_${document.getElementById('difficulty').value}`; }
+        function getHighScoreKey() { return `ff_score_v3_${document.getElementById('grid-size').value}_${document.getElementById('difficulty').value}`; }
         
         function calculateScore() {
             clearInterval(timerInterval);
@@ -450,7 +403,7 @@
             }
         }
 
-        const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d', { alpha: false });
+        const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d', { alpha: true });
         const winOverlay = document.getElementById('win-overlay'); const btnUndo = document.getElementById('btn-undo');
         
         let level = null; let playerPaths = {}; let completedPaths = {};
@@ -507,39 +460,21 @@
             }
         }
 
-        /* --- THEME RENDERER --- */
+        /* --- OVERHAULED THEME RENDERER --- */
         function drawBoard() {
             if (!level || cellSize === 0) return;
             
-            // Background Layer
-            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--canvas-bg').trim();
-            if(ctx.fillStyle.includes('gradient') || ctx.fillStyle === '') ctx.fillStyle = '#000'; // Canvas fallback
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Let CSS Backgrounds show through when transparent
 
             const isRetro = currentTheme === 'theme-retro'; const isCyber = currentTheme === 'theme-cyberpunk';
             const is3D = currentTheme === 'theme-3d'; const isMed = currentTheme === 'theme-medieval'; const isVapor = currentTheme === 'theme-vaporwave';
 
-            // Custom Background Patterns
-            if (isVapor) {
-                ctx.fillStyle = '#ffb6c1';
-                for(let y=0; y<level.height; y++) for(let x=0; x<level.width; x++) if((x+y)%2===0) ctx.fillRect(x*cellSize, y*cellSize, cellSize, cellSize);
-            } else if (isMed) {
-                ctx.fillStyle = '#e6d8be'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = 'rgba(141, 110, 99, 0.1)';
-                for(let i=0; i<100; i++) { ctx.beginPath(); ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*40, 0, Math.PI*2); ctx.fill(); }
-            } else if (isCyber) {
-                ctx.fillStyle = '#020205'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-
-            // Grid Layer
+            // Draw Background Grids
             ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--grid-line-color').trim();
             ctx.lineWidth = isRetro ? 2 : 1;
             
             if (isMed) {
-                ctx.setLineDash([4, 4]);
-                for (let i = 0; i <= level.width; i++) { ctx.beginPath(); ctx.moveTo(i * cellSize, 0); ctx.lineTo(i * cellSize, canvas.height); ctx.stroke(); }
-                for (let i = 0; i <= level.height; i++) { ctx.beginPath(); ctx.moveTo(0, i * cellSize); ctx.lineTo(canvas.width, i * cellSize); ctx.stroke(); }
-                ctx.setLineDash([]);
+                // No drawn squares, just let the wood grain show
             } else if (!isVapor) {
                 for (let y = 0; y < level.height; y++) for (let x = 0; x < level.width; x++) {
                     ctx.beginPath();
@@ -557,44 +492,82 @@
             const renderPath = (color, path, connected) => {
                 if (path.length < 2) return;
                 
-                // Shadow/Base pass
-                ctx.beginPath();
-                if (is3D) { ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = pathWidth + 6; }
-                else if (isCyber) { ctx.strokeStyle = color; ctx.lineWidth = pathWidth + 4; ctx.shadowColor = color; ctx.shadowBlur = 15; }
-                else if (isMed) { ctx.strokeStyle = '#3e2723'; ctx.lineWidth = pathWidth + 4; }
-                else if (isVapor) { ctx.strokeStyle = '#fff'; ctx.lineWidth = pathWidth + 8; }
-                else { ctx.strokeStyle = color; ctx.lineWidth = pathWidth; } // Retro defaults to base
-
-                for (let i = 0; i < path.length; i++) {
-                    const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2 + (is3D?3:0);
-                    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-                }
-                ctx.stroke(); ctx.shadowBlur = 0;
-
-                // Color Pass
-                if (!isRetro) {
+                if (isMed) {
+                    // Tavern Yarn Style
+                    // 1. Drop shadow
+                    ctx.beginPath(); ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = pathWidth + 4;
+                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2 + 4; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+                    ctx.stroke();
+                    // 2. Base Wool Color
                     ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = pathWidth;
-                    for (let i = 0; i < path.length; i++) {
-                        const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2;
-                        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+                    ctx.stroke();
+                    // 3. Yarn Twine Texture
+                    ctx.beginPath(); ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = pathWidth; ctx.setLineDash([4, 4]);
+                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+                    ctx.stroke(); ctx.setLineDash([]);
+                    
+                } else if (is3D) {
+                    // High-Gloss 3D Glass/Chrome Style
+                    // 1. Dark Base / Bevel
+                    ctx.beginPath(); ctx.strokeStyle = '#111'; ctx.lineWidth = pathWidth + 6;
+                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2 + 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+                    ctx.stroke();
+                    // 2. Base Color
+                    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = pathWidth;
+                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+                    ctx.stroke();
+                    // 3. Specular Highlight Center
+                    ctx.beginPath(); ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = pathWidth * 0.4;
+                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+                    ctx.stroke();
+                    // 4. Tight Specular
+                    ctx.beginPath(); ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = pathWidth * 0.15;
+                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+                    ctx.stroke();
+
+                } else if (isCyber) {
+                    // Cyberpunk Neon Style
+                    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = pathWidth + 2; ctx.shadowColor = color; ctx.shadowBlur = 20;
+                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+                    ctx.stroke(); ctx.shadowBlur = 0;
+                    
+                    ctx.beginPath(); ctx.strokeStyle = '#fff'; ctx.lineWidth = pathWidth * 0.3;
+                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+                    ctx.stroke();
+
+                } else if (isVapor) {
+                    // Vaporwave Pastel Tubing Style
+                    ctx.beginPath(); ctx.strokeStyle = '#fff'; ctx.lineWidth = pathWidth + 8;
+                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+                    ctx.stroke();
+                    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = pathWidth;
+                    for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+                    ctx.stroke();
+                    if(connected) {
+                        ctx.beginPath(); ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = pathWidth * 0.5;
+                        for (let i = 0; i < path.length; i++) { const px = path[i].x * cellSize + cellSize / 2, py = path[i].y * cellSize + cellSize / 2; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+                        ctx.stroke();
+                    }
+
+                } else if (isRetro) {
+                    // Retro Arcade Style
+                    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = pathWidth;
+                    for (let i = 0; i < path.length - 1; i++) {
+                        const px1 = path[i].x * cellSize + cellSize/2, py1 = path[i].y * cellSize + cellSize/2;
+                        const px2 = path[i+1].x * cellSize + cellSize/2, py2 = path[i+1].y * cellSize + cellSize/2;
+                        ctx.moveTo(px1, py1); ctx.lineTo(px2, py2);
                     }
                     ctx.stroke();
-                }
-
-                // Highlight Pass
-                if (connected || is3D || isCyber) {
-                    ctx.beginPath();
-                    if(isCyber) { ctx.strokeStyle = '#fff'; ctx.lineWidth = pathWidth * 0.25; }
-                    else if(is3D) { ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = pathWidth * 0.2; }
-                    else if(isVapor) { ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = pathWidth * 0.4; }
-                    else { ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = pathWidth * 0.3; }
-
-                    let offset = is3D ? -2 : 0;
-                    for (let i = 0; i < path.length; i++) {
-                        const px = path[i].x * cellSize + cellSize / 2 + offset, py = path[i].y * cellSize + cellSize / 2 + offset;
-                        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                    if (connected) {
+                        ctx.beginPath(); ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = pathWidth * 0.3;
+                        for (let i = 0; i < path.length - 1; i++) {
+                            const px1 = path[i].x * cellSize + cellSize/2, py1 = path[i].y * cellSize + cellSize/2;
+                            const px2 = path[i+1].x * cellSize + cellSize/2, py2 = path[i+1].y * cellSize + cellSize/2;
+                            ctx.moveTo(px1, py1); ctx.lineTo(px2, py2);
+                        }
+                        ctx.stroke();
                     }
-                    ctx.stroke();
                 }
             };
 
@@ -610,20 +583,27 @@
                     if (isRetro) {
                         ctx.fillStyle = s.color; ctx.fillRect(x - dotRadius, y - dotRadius, dotRadius*2, dotRadius*2);
                         if(conn) { ctx.fillStyle='#fff'; ctx.fillRect(x - dotRadius/3, y - dotRadius/3, (dotRadius/3)*2, (dotRadius/3)*2); }
-                    } else {
-                        if (is3D) { ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.beginPath(); ctx.arc(x, y+3, dotRadius+2, 0, Math.PI*2); ctx.fill(); }
-                        if (isCyber) { ctx.shadowColor = s.color; ctx.shadowBlur = 15; }
-                        
-                        ctx.fillStyle = isMed ? '#3e2723' : (isVapor ? '#fff' : '#222');
-                        ctx.beginPath(); ctx.arc(x, y, dotRadius + (isVapor?4:(is3D?2:1)), 0, Math.PI * 2); ctx.fill();
-                        
-                        ctx.shadowBlur = 0; ctx.fillStyle = s.color;
-                        ctx.beginPath(); ctx.arc(x, y, dotRadius * 0.85, 0, Math.PI * 2); ctx.fill();
-                        
-                        if (conn || is3D || isCyber) {
-                            ctx.fillStyle = isCyber ? '#fff' : 'rgba(255,255,255,0.7)';
-                            ctx.beginPath(); ctx.arc(x - (is3D?2:0), y - (is3D?2:0), dotRadius * 0.35, 0, Math.PI * 2); ctx.fill();
-                        }
+                    } else if (isMed) {
+                        // Iron Nail / Wooden Peg
+                        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.beginPath(); ctx.arc(x, y+3, dotRadius, 0, Math.PI * 2); ctx.fill(); // Shadow
+                        ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(x, y, dotRadius, 0, Math.PI * 2); ctx.fill(); // Base metal
+                        ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(x, y, dotRadius * 0.7, 0, Math.PI * 2); ctx.fill(); // Color inset
+                        ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.beginPath(); ctx.arc(x - 2, y - 2, dotRadius * 0.2, 0, Math.PI * 2); ctx.fill(); // Highlight
+                    } else if (is3D) {
+                        ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.beginPath(); ctx.arc(x, y+3, dotRadius+2, 0, Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(x, y, dotRadius+2, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(x, y, dotRadius*0.9, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.arc(x-2, y-2, dotRadius * 0.4, 0, Math.PI * 2); ctx.fill();
+                    } else if (isCyber) {
+                        ctx.shadowColor = s.color; ctx.shadowBlur = 15;
+                        ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(x, y, dotRadius + 1, 0, Math.PI * 2); ctx.fill();
+                        ctx.shadowBlur = 0; ctx.fillStyle = '#05050a'; ctx.beginPath(); ctx.arc(x, y, dotRadius * 0.7, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(x, y, dotRadius * 0.4, 0, Math.PI * 2); ctx.fill();
+                        if (conn) { ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y, dotRadius * 0.2, 0, Math.PI * 2); ctx.fill(); }
+                    } else if (isVapor) {
+                        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y, dotRadius + 4, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(x, y, dotRadius, 0, Math.PI * 2); ctx.fill();
+                        if (conn) { ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.beginPath(); ctx.arc(x, y, dotRadius * 0.5, 0, Math.PI * 2); ctx.fill(); }
                     }
                 };
                 drawEndpoint(cx, cy); drawEndpoint(cx2, cy2);
