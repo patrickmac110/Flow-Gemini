@@ -1,16 +1,17 @@
-Flow Forge GitHub Pages PWA package
+Flow Forge Classic Flow trained build
 
-Upload these files at the same directory level in your GitHub Pages site:
-- index.html
-- manifest.json
-- service_worker.js
-- icon-192.png
-- icon-512.png
-- maskable-icon-512.png
+Upload all files in this zip to the same GitHub Pages folder.
 
-Important after replacing an older build:
-1. In Chrome, open the site URL.
-2. DevTools > Application > Service workers > Update on reload, or on Android clear the old installed app/cache if the icon does not update immediately.
-3. Reinstall the PWA. Android launchers often keep the old icon until uninstall/reinstall.
+New in this build:
+- Built-in generator: Classic Flow — trained profile
+- Uses Patrick's 21-round hybrid trainer profile
+- Pasted custom profiles now preserve pipeCountAdjustment
+- Custom generation uses at least 10 candidate attempts even if trainer output says candidateCount: 6
 
-This package intentionally uses real PNG icons in manifest.json. Do not use SVG/data-URI icons for the Android app launcher.
+Files:
+index.html
+manifest.json
+service_worker.js
+icon-192.png
+icon-512.png
+maskable-icon-512.png

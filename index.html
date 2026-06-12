@@ -545,6 +545,31 @@
       font-weight: 800;
       outline: none;
     }
+    textarea {
+      width: 100%;
+      min-height: 112px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--bg) 78%, #000 0%);
+      color: var(--text);
+      padding: 12px;
+      font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      line-height: 1.45;
+      resize: vertical;
+      outline: none;
+    }
+
+    .mini-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .button.compact {
+      min-height: 38px;
+      padding: 8px 10px;
+      font-size: 12px;
+    }
 
     input[type="range"] {
       width: 100%;
@@ -970,7 +995,16 @@
             <option value="fast">Original Forge — restored</option>
             <option value="aesthetic">Aesthetic Forge — scored alternate</option>
           </select>
-          <small>Original Forge uses the restored induced-path merge generator. Aesthetic Forge runs that same no-double-back generator many times, then picks a candidate using difficulty-specific scoring.</small>
+          <small>Original Forge uses the restored induced-path merge generator. Aesthetic Forge runs that same no-double-back generator many times, then picks a candidate using difficulty-specific scoring. Classic Flow uses your 21-round trained profile. Custom profiles are pasted from the visualizer trainer.</small>
+        </div>
+        <div class="control">
+          <label for="custom-profile-input">Custom Algorithm Profile</label>
+          <textarea id="custom-profile-input" placeholder='Paste the JSON copied from the visualizer trainer here, then tap Save Custom.'></textarea>
+          <div class="mini-actions">
+            <button class="button compact primary" id="save-custom-profile-button" type="button">Save Custom</button>
+            <button class="button compact" id="delete-custom-profile-button" type="button">Delete Selected</button>
+          </div>
+          <small>You can save multiple custom profiles. They appear in Level Generator as “Custom: …”.</small>
         </div>
         <div class="control">
           <label for="breaks-select">Line Breaks</label>
@@ -1120,7 +1154,9 @@
         dpr: Math.max(1, window.devicePixelRatio || 1),
         resizeQueued: false,
         lastScore: 0,
-        lastPointerCell: null
+        lastPointerCell: null,
+        lastPointerPoint: null,
+        customProfiles: []
       };
 
       function currentPalette() {
@@ -1143,6 +1179,7 @@
       function adjacent(a, b) { return Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1; }
       function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
       const SETTINGS_STORAGE_KEY = 'flowForge.settings.v3';
+      const CUSTOM_PROFILES_STORAGE_KEY = 'flowForge.customGeneratorProfiles.v1';
       const SETTINGS_LEGACY_KEYS = ['flowForge.settings.v2', 'flowForge.settings.v1', 'flowForgeSettings', 'ff_settings_v1', 'flow_forge_settings'];
 
       function normalizeSettings(raw) {
@@ -1157,7 +1194,7 @@
         if (!theme.looks[next.look]) next.look = Object.keys(theme.looks)[0];
         next.size = clamp(parseInt(next.size, 10) || defaults.size, 5, 12);
         if (!['easy', 'medium', 'hard'].includes(next.difficulty)) next.difficulty = defaults.difficulty;
-        if (!['fast', 'aesthetic'].includes(next.generator)) next.generator = defaults.generator;
+        if (!['fast', 'aesthetic', 'classic-trained'].includes(next.generator) && !String(next.generator || '').startsWith('custom:')) next.generator = defaults.generator;
         next.allowBreaks = next.allowBreaks === true || next.allowBreaks === 'true';
         next.inputAssist = clamp(parseInt(next.inputAssist, 10) || defaults.inputAssist, 0, 100);
         return next;
@@ -1180,6 +1217,167 @@
 
       function saveSettings() {
         try { localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(state.settings)); } catch (_) {}
+      }
+
+      const BuiltInCustomProfiles = {
+        'classic-trained': {
+          id: 'classic-trained',
+          name: 'Classic Flow — trained',
+          profileName: 'Classic Flow Forge hybrid-trained profile',
+          rounds: 21,
+          trainingMethod: 'pairwise preference nudging + pipe-count exploration + 1-2 evolutionary explorer profiles per batch',
+          intent: 'Prefer perimeter highways, nested frames, parallel lanes, broad turns, and readable official-Flow-like structure.',
+          pipeCountAdjustment: 0.13,
+          weights: {
+            candidateCount: 14,
+            coverageWeight: 127,
+            endpointWeight: 16.68,
+            turnWeight: 1377.32,
+            balancePenalty: 51.84,
+            shortPenalty: 23.52,
+            straightPenalty: 5,
+            perimeterReward: 63,
+            nearPerimeterReward: 12,
+            parallelLaneReward: 112.8,
+            broadSegmentReward: 96.16,
+            edgeEndpointReward: 15.68,
+            frameWrapReward: 116.32,
+            centerWanderPenalty: 95,
+            wigglePenalty: 109.16
+          }
+        }
+      };
+
+      function normalizeCustomProfile(raw) {
+        if (!raw) return null;
+        const profile = raw.weights ? raw : { profileName: raw.profileName || raw.name || 'Custom Profile', weights: raw };
+        const weights = profile.weights || {};
+        const idBase = String(profile.id || profile.profileName || profile.name || 'custom')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '')
+          .slice(0, 32) || 'custom';
+        return {
+          id: profile.id || `${idBase}-${Date.now().toString(36)}`,
+          name: String(profile.profileName || profile.name || 'Custom Profile').slice(0, 60),
+          intent: String(profile.intent || '').slice(0, 220),
+          rounds: parseInt(profile.rounds, 10) || 0,
+          trainingMethod: String(profile.trainingMethod || '').slice(0, 180),
+          pipeCountAdjustment: Number.isFinite(parseFloat(profile.pipeCountAdjustment)) ? parseFloat(profile.pipeCountAdjustment) : 0,
+          weights: Object.assign({}, weights)
+        };
+      }
+
+      function loadCustomProfiles() {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(CUSTOM_PROFILES_STORAGE_KEY) || '[]');
+          state.customProfiles = Array.isArray(parsed) ? parsed.map(normalizeCustomProfile).filter(Boolean) : [];
+        } catch (_) {
+          state.customProfiles = [];
+        }
+      }
+
+      function saveCustomProfiles() {
+        try { localStorage.setItem(CUSTOM_PROFILES_STORAGE_KEY, JSON.stringify(state.customProfiles)); } catch (_) {}
+      }
+
+      function customProfileForGenerator(value = state.settings.generator) {
+        if (BuiltInCustomProfiles[value]) return BuiltInCustomProfiles[value];
+        if (!String(value || '').startsWith('custom:')) return null;
+        const id = String(value).slice('custom:'.length);
+        return state.customProfiles.find(profile => profile.id === id) || null;
+      }
+
+      function generatorDisplayName(value = state.settings.generator) {
+        if (value === 'aesthetic') return 'Aesthetic Forge';
+        if (value === 'fast') return 'Original Forge';
+        if (value === 'classic-trained') return 'Classic Flow';
+        const profile = customProfileForGenerator(value);
+        return profile ? `Custom: ${profile.name}` : 'Custom Profile';
+      }
+
+      function populateGeneratorSelect() {
+        const select = $('generator-select');
+        const current = state.settings.generator;
+        select.innerHTML = '';
+        const base = [
+          ['fast', 'Original Forge — restored'],
+          ['aesthetic', 'Aesthetic Forge — scored alternate'],
+          ['classic-trained', 'Classic Flow — trained profile']
+        ];
+        for (const [value, label] of base) {
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = label;
+          select.appendChild(option);
+        }
+        if (state.customProfiles.length) {
+          const group = document.createElement('optgroup');
+          group.label = 'Custom profiles';
+          for (const profile of state.customProfiles) {
+            const option = document.createElement('option');
+            option.value = `custom:${profile.id}`;
+            option.textContent = `Custom: ${profile.name}`;
+            group.appendChild(option);
+          }
+          select.appendChild(group);
+        }
+        select.value = current;
+        if (!select.value) {
+          state.settings.generator = 'fast';
+          select.value = 'fast';
+        }
+      }
+
+      function saveCustomProfileFromInput() {
+        const input = $('custom-profile-input');
+        let parsed;
+        try {
+          parsed = JSON.parse(input.value.trim());
+        } catch (err) {
+          $('status-text').innerHTML = '<strong>Custom profile error.</strong> Paste valid JSON from the visualizer trainer.';
+          return;
+        }
+        const items = Array.isArray(parsed) ? parsed : [parsed];
+        let lastProfile = null;
+        for (const item of items) {
+          const profile = normalizeCustomProfile(item);
+          if (!profile || !profile.weights) continue;
+          const existingIndex = state.customProfiles.findIndex(p => p.id === profile.id || p.name === profile.name);
+          if (existingIndex >= 0) state.customProfiles[existingIndex] = Object.assign({}, state.customProfiles[existingIndex], profile);
+          else state.customProfiles.push(profile);
+          lastProfile = profile;
+        }
+        if (!lastProfile) {
+          $('status-text').innerHTML = '<strong>Custom profile error.</strong> JSON did not contain a weights object.';
+          return;
+        }
+        saveCustomProfiles();
+        state.settings.generator = `custom:${lastProfile.id}`;
+        saveSettings();
+        populateGeneratorSelect();
+        $('generator-select').value = state.settings.generator;
+        input.value = '';
+        $('status-text').innerHTML = `<strong>Saved.</strong> ${lastProfile.name} is now selected.`;
+      }
+
+      function deleteSelectedCustomProfile() {
+        const value = $('generator-select').value;
+        if (!String(value || '').startsWith('custom:')) {
+          $('status-text').innerHTML = '<strong>No custom profile selected.</strong>';
+          return;
+        }
+        const id = value.slice('custom:'.length);
+        const before = state.customProfiles.length;
+        state.customProfiles = state.customProfiles.filter(profile => profile.id !== id);
+        if (state.customProfiles.length !== before) {
+          if (state.settings.generator === value) state.settings.generator = 'aesthetic';
+          saveCustomProfiles();
+          saveSettings();
+          populateGeneratorSelect();
+          $('generator-select').value = state.settings.generator;
+          $('status-text').innerHTML = '<strong>Deleted.</strong> Custom profile removed.';
+        }
       }
 
       function randInt(max) { return Math.floor(Math.random() * max); }
@@ -1268,12 +1466,14 @@
       }
 
       class PathCoverGenerator {
-        constructor(width, height, count, palette, mode, difficulty = 'medium') {
+        constructor(width, height, count, palette, mode, difficulty = 'medium', customProfile = null) {
           this.W = width;
           this.H = height;
           this.count = count;
           this.palette = palette;
-          this.mode = mode === 'aesthetic' ? 'aesthetic' : 'legacy';
+          this.customProfile = customProfile;
+          this.customWeights = customProfile?.weights || null;
+          this.mode = customProfile ? 'custom' : (mode === 'aesthetic' ? 'aesthetic' : 'legacy');
           this.difficulty = difficulty;
           this.profile = difficultyProfile(difficulty);
         }
@@ -1284,7 +1484,7 @@
           // orthogonally adjacent cells that were not actually connected by the pipe.
           // That creates visual "doubling back" / hairpin shapes. The original algorithm's
           // induced-path validation is restored below and is now a hard rule.
-          const attempts = this.mode === 'aesthetic' ? this.profile.attempts : Math.max(2, Math.floor(this.profile.attempts / 8));
+          const attempts = this.mode === 'custom' ? clamp(Math.max(10, parseInt(this.customWeights?.candidateCount, 10) || 10), 6, 80) : (this.mode === 'aesthetic' ? this.profile.attempts : Math.max(2, Math.floor(this.profile.attempts / 8)));
           let best = null;
           let bestScore = -Infinity;
 
@@ -1293,9 +1493,11 @@
             if (!candidate) continue;
             if (!this.isNoDoubleBackCandidate(candidate.sequences)) continue;
 
-            const score = this.mode === 'aesthetic'
-              ? this.scoreCandidate(candidate.sequences)
-              : this.legacyScore(candidate.sequences, candidate.coverage);
+            const score = this.mode === 'custom'
+              ? this.customScoreCandidate(candidate.sequences)
+              : (this.mode === 'aesthetic'
+                ? this.scoreCandidate(candidate.sequences)
+                : this.legacyScore(candidate.sequences, candidate.coverage));
 
             if (score > bestScore) {
               bestScore = score;
@@ -1691,6 +1893,134 @@
           score += this.difficultyFitness(sequences);
           score += Math.random() * 35;
           return score;
+        }
+
+        customScoreCandidate(sequences) {
+          const w = this.customWeights || {};
+          const totalCells = this.W * this.H;
+          const lengths = sequences.map(s => s.length);
+          const mean = lengths.reduce((a, b) => a + b, 0) / Math.max(1, lengths.length);
+          const variance = lengths.reduce((sum, length) => sum + Math.pow(length - mean, 2), 0) / Math.max(1, lengths.length);
+          const std = Math.sqrt(variance);
+          const occupied = new Set();
+
+          let endpointDistance = 0, turns = 0, segmentsCount = 0, shortMissing = 0, straightExcess = 0, longestRun = 0;
+          let perimeterCells = 0, nearPerimeterCells = 0, centerCells = 0, edgeEndpoints = 0, frameWrapUnits = 0, broadSegmentUnits = 0, wiggleUnits = 0;
+          const segments = [];
+
+          const ringOf = cell => Math.min(cell.x, cell.y, this.W - 1 - cell.x, this.H - 1 - cell.y);
+          const sideSetOf = cell => {
+            const sides = new Set();
+            if (cell.y === 0) sides.add('top');
+            if (cell.y === this.H - 1) sides.add('bottom');
+            if (cell.x === 0) sides.add('left');
+            if (cell.x === this.W - 1) sides.add('right');
+            return sides;
+          };
+
+          sequences.forEach((seq, pipeIndex) => {
+            endpointDistance += Math.abs(seq[0].x - seq[seq.length - 1].x) + Math.abs(seq[0].y - seq[seq.length - 1].y);
+            if (seq.length < 4) shortMissing += 4 - seq.length;
+            const sides = new Set();
+
+            for (const cell of seq) {
+              occupied.add(`${cell.x},${cell.y}`);
+              const ring = ringOf(cell);
+              if (ring === 0) perimeterCells++;
+              if (ring <= 1) nearPerimeterCells++;
+              if (ring >= Math.floor(Math.min(this.W, this.H) / 3)) centerCells++;
+              for (const side of sideSetOf(cell)) sides.add(side);
+            }
+
+            for (const endpoint of [seq[0], seq[seq.length - 1]]) {
+              if (ringOf(endpoint) <= 1) edgeEndpoints++;
+            }
+            if (sides.size >= 2) frameWrapUnits += sides.size - 1;
+
+            let run = 1;
+            let prevDir = null;
+            const runs = [];
+            for (let i = 1; i < seq.length; i++) {
+              const a = seq[i - 1], b = seq[i];
+              const dir = { x: b.x - a.x, y: b.y - a.y };
+              segments.push({ a, b, dir, pipeIndex });
+              const dirKey = `${dir.x},${dir.y}`;
+              if (dirKey === prevDir) run++;
+              else {
+                if (prevDir !== null) runs.push(run);
+                run = 1;
+              }
+              prevDir = dirKey;
+              longestRun = Math.max(longestRun, run);
+              if (run > 3) straightExcess++;
+            }
+            runs.push(run);
+            broadSegmentUnits += runs.filter(r => r >= 4).reduce((sum, r) => sum + r - 3, 0);
+
+            for (let i = 1; i < seq.length - 1; i++) {
+              const a = seq[i - 1], b = seq[i], c = seq[i + 1];
+              const d1 = { x: b.x - a.x, y: b.y - a.y };
+              const d2 = { x: c.x - b.x, y: c.y - b.y };
+              if (d1.x !== d2.x || d1.y !== d2.y) {
+                turns++;
+                if (i > 1 && i < seq.length - 2) {
+                  const aa = seq[i - 2], dd = seq[i + 2];
+                  const before = `${a.x - aa.x},${a.y - aa.y}`;
+                  const after = `${dd.x - c.x},${dd.y - c.y}`;
+                  if (before !== `${d1.x},${d1.y}` && after !== `${d2.x},${d2.y}`) wiggleUnits++;
+                }
+              }
+              segmentsCount++;
+            }
+          });
+
+          let parallelLaneUnits = 0;
+          for (let i = 0; i < segments.length; i++) {
+            for (let j = i + 1; j < segments.length; j++) {
+              const s1 = segments[i], s2 = segments[j];
+              if (s1.pipeIndex === s2.pipeIndex) continue;
+              const sameAxis = Math.abs(s1.dir.x) === Math.abs(s2.dir.x) && Math.abs(s1.dir.y) === Math.abs(s2.dir.y);
+              if (!sameAxis) continue;
+              if (s1.dir.x !== 0) {
+                const yApart = Math.abs(s1.a.y - s2.a.y);
+                const overlap = Math.max(Math.min(s1.a.x, s1.b.x), Math.min(s2.a.x, s2.b.x)) <= Math.min(Math.max(s1.a.x, s1.b.x), Math.max(s2.a.x, s2.b.x));
+                if (yApart === 1 && overlap) parallelLaneUnits += 0.5;
+              } else {
+                const xApart = Math.abs(s1.a.x - s2.a.x);
+                const overlap = Math.max(Math.min(s1.a.y, s1.b.y), Math.min(s2.a.y, s2.b.y)) <= Math.min(Math.max(s1.a.y, s1.b.y), Math.max(s2.a.y, s2.b.y));
+                if (xApart === 1 && overlap) parallelLaneUnits += 0.5;
+              }
+            }
+          }
+
+          const coverage = occupied.size / totalCells;
+          const turnRatio = turns / Math.max(1, segmentsCount);
+          const perimeterRatio = perimeterCells / totalCells;
+          const nearPerimeterRatio = nearPerimeterCells / totalCells;
+          const centerRatio = centerCells / totalCells;
+          const edgeEndpointRatio = edgeEndpoints / Math.max(1, sequences.length * 2);
+          const parallelNorm = parallelLaneUnits / Math.max(1, totalCells);
+          const broadNorm = broadSegmentUnits / Math.max(1, totalCells);
+          const frameNorm = frameWrapUnits / Math.max(1, sequences.length * 3);
+          const wiggleNorm = wiggleUnits / Math.max(1, segmentsCount);
+
+          let score = 0;
+          score += coverage * (w.coverageWeight ?? 115) * 100;
+          score += endpointDistance * (w.endpointWeight ?? 16);
+          score += turnRatio * (w.turnWeight ?? 900);
+          score += perimeterRatio * (w.perimeterReward ?? 95) * 100;
+          score += nearPerimeterRatio * (w.nearPerimeterReward ?? 38) * 100;
+          score += parallelNorm * (w.parallelLaneReward ?? 85) * 100;
+          score += broadNorm * (w.broadSegmentReward ?? 55) * 100;
+          score += edgeEndpointRatio * (w.edgeEndpointReward ?? 32) * 100;
+          score += frameNorm * (w.frameWrapReward ?? 75) * 100;
+          score -= std * (w.balancePenalty ?? 55);
+          score -= shortMissing * (w.shortPenalty ?? 24);
+          score -= straightExcess * (w.straightPenalty ?? 4);
+          score -= centerRatio * (w.centerWanderPenalty ?? 42) * 100;
+          score -= wiggleNorm * (w.wigglePenalty ?? 70) * 100;
+
+          return score + Math.random() * 20;
         }
 
         toLevel(sequences, quality) {
@@ -2470,7 +2800,9 @@
 
       function initGame() {
         const palette = currentPalette();
-        const count = pipeCountFor(state.settings.size, state.settings.difficulty);
+        const selectedProfile = customProfileForGenerator(state.settings.generator);
+        const baseCount = pipeCountFor(state.settings.size, state.settings.difficulty);
+        const count = clamp(Math.round(baseCount + (selectedProfile?.pipeCountAdjustment || 0)), 3, Math.min(state.settings.size * 2, state.settings.size + 4));
         $('status-text').innerHTML = '<strong>Forging level…</strong>';
         $('win-overlay').classList.remove('active');
         $('score-label').textContent = 'Final score';
@@ -2482,12 +2814,14 @@
         state.activePipeId = null;
         state.activePointerId = null;
         state.lastPointerCell = null;
+        state.lastPointerPoint = null;
         state.stats = { moves: 0, hints: 0, undos: 0, resets: 0 };
         state.undoStack = [];
         $('undo-button').disabled = true;
         resetTimer();
 
-        const generator = new PathCoverGenerator(state.settings.size, state.settings.size, count, palette, state.settings.generator, state.settings.difficulty);
+        const customProfile = selectedProfile;
+        const generator = new PathCoverGenerator(state.settings.size, state.settings.size, count, palette, customProfile ? 'custom' : state.settings.generator, state.settings.difficulty, customProfile);
         state.level = generator.generate();
         resetPlayerPaths();
         updateHighScore();
@@ -2501,7 +2835,7 @@
       }
 
       function updateLevelLabels() {
-        const genName = state.settings.generator === 'aesthetic' ? 'Aesthetic Forge' : 'Original Forge';
+        const genName = generatorDisplayName(state.settings.generator);
         $('generator-label').textContent = genName;
         $('level-subtitle').textContent = `${state.settings.size}×${state.settings.size} · ${state.settings.difficulty} · ${state.level ? state.level.pipes.length : 0} pipes`;
       }
@@ -2605,12 +2939,12 @@
 
         // More forgiving default than the previous balanced pass, but still bounded.
         // The search window grows slowly with assist strength and target distance.
-        const maxJump = Math.round(4 + assist * 6);          // 4..10 cells
+        const maxJump = Math.round(5 + assist * 7);          // 5..12 cells
         if (manhattan > maxJump) return [];
 
-        const pad = Math.round(1 + assist * 3);              // 1..4 cells around gesture
-        const extraBudget = Math.round(2 + assist * 6);      // 2..8 detour cells
-        const maxLen = Math.min(18, manhattan + extraBudget);
+        const pad = Math.round(1 + assist * 3.5);            // 1..5 cells around gesture
+        const extraBudget = Math.round(3 + assist * 7);      // 3..10 detour cells
+        const maxLen = Math.min(22, manhattan + extraBudget);
         const minX = Math.max(0, Math.min(start.x, target.x) - pad);
         const maxX = Math.min(state.level.width - 1, Math.max(start.x, target.x) + pad);
         const minY = Math.max(0, Math.min(start.y, target.y) - pad);
@@ -2684,6 +3018,41 @@
         return { x, y };
       }
 
+      function pointerPointFromEvent(event) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: clamp(event.clientX - rect.left, 0, state.cssSize),
+          y: clamp(event.clientY - rect.top, 0, state.cssSize)
+        };
+      }
+
+      function cellFromPoint(point) {
+        return {
+          x: clamp(Math.floor(point.x / state.cellSize), 0, state.level.width - 1),
+          y: clamp(Math.floor(point.y / state.cellSize), 0, state.level.height - 1)
+        };
+      }
+
+      function cellsAlongPointerSegment(from, to) {
+        if (!from || !to || !state.cellSize) return [cellFromPoint(to)];
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const distance = Math.hypot(dx, dy);
+        const sampleCount = Math.max(1, Math.ceil(distance / Math.max(4, state.cellSize * 0.28)));
+        const cells = [];
+        let lastKey = null;
+        for (let i = 1; i <= sampleCount; i++) {
+          const t = i / sampleCount;
+          const cell = cellFromPoint({ x: from.x + dx * t, y: from.y + dy * t });
+          const key = keyOf(cell);
+          if (key !== lastKey) {
+            cells.push(cell);
+            lastKey = key;
+          }
+        }
+        return cells;
+      }
+
       function trimOtherPathsAt(cell, pipeId) {
         for (const pipe of state.level.pipes) {
           if (pipe.id === pipeId) continue;
@@ -2708,7 +3077,8 @@
         const last = path[path.length - 1];
         if (isOwnEndpoint(last, pipe)) return false;
 
-        const snapMaxDistance = 2;
+        const assist = clamp((state.settings.inputAssist ?? 75) / 100, 0, 1);
+        const snapMaxDistance = assist > 0.82 ? 3 : 2;
         const endpoints = [pipe.path[0], pipe.path[pipe.path.length - 1]];
         const candidates = endpoints
           .filter(endpoint => !path.some(cell => sameCell(cell, endpoint)))
@@ -2725,7 +3095,7 @@
 
           // Snapping should feel like a magnetic endpoint, not a hidden mini-solver.
           // One extra correction cell is allowed for touch slop; longer routes are ignored.
-          if (route.length > candidate.distance + 1) continue;
+          if (route.length > candidate.distance + Math.round(1 + assist * 2)) continue;
 
           const beforeSnap = state.playerPaths[pipe.id].map(cell => ({ x: cell.x, y: cell.y }));
           for (const step of route) {
@@ -2748,9 +3118,11 @@
         if (!state.level || state.gameWon || state.animating || $('settings-modal').classList.contains('active')) return;
         if (!state.cellSize) resizeCanvas();
         event.preventDefault();
-        const cell = cellFromEvent(event);
+        const point = pointerPointFromEvent(event);
+        const cell = cellFromPoint(point);
         state.moveTrackedThisStroke = false;
         state.lastPointerCell = cell;
+        state.lastPointerPoint = point;
 
         const endpointPipe = pipeAtEndpoint(cell);
         const existing = pipeAtPlayerCell(cell);
@@ -2769,49 +3141,80 @@
         drawBoard();
       }
 
-      function handlePointerMove(event) {
-        if (!state.drawing || state.activePointerId !== event.pointerId || state.animating) return;
-        event.preventDefault();
-        const pipe = state.level.pipes.find(p => p.id === state.activePipeId);
-        if (!pipe) return;
-        const target = cellFromEvent(event);
-        const path = state.playerPaths[pipe.id];
-        const last = path[path.length - 1];
-        if (!last || sameCell(last, target)) return;
-
-        const selfIdx = path.findIndex(p => sameCell(p, target));
-        if (selfIdx !== -1) {
-          if (!state.moveTrackedThisStroke) {
-            startTimerIfNeeded();
-            state.stats.moves++;
-            state.moveTrackedThisStroke = true;
-          }
-          state.playerPaths[pipe.id] = path.slice(0, selfIdx + 1);
-          updateMetrics();
-          drawBoard();
-          return;
-        }
-
-        if (path.length > 1 && isOwnEndpoint(last, pipe)) return;
-
-        const route = routeBetween(last, target, pipe.id);
-        if (!route.length) return;
-
+      function ensureMoveTracked() {
         if (!state.moveTrackedThisStroke) {
           startTimerIfNeeded();
           state.stats.moves++;
           state.moveTrackedThisStroke = true;
         }
+      }
 
+      function processPointerTargetCell(pipe, target) {
+        const path = state.playerPaths[pipe.id];
+        const last = path[path.length - 1];
+        if (!last || sameCell(last, target)) return false;
+
+        const selfIdx = path.findIndex(p => sameCell(p, target));
+        if (selfIdx !== -1) {
+          ensureMoveTracked();
+          state.playerPaths[pipe.id] = path.slice(0, selfIdx + 1);
+          return true;
+        }
+
+        if (path.length > 1 && isOwnEndpoint(last, pipe)) return false;
+
+        // Endpoint magnet while drawing: when the pointer gets very close to the
+        // matching endpoint, aim for the endpoint instead of the slightly-missed cell.
+        const assist = clamp((state.settings.inputAssist ?? 75) / 100, 0, 1);
+        let adjustedTarget = target;
+        const endpointMagnetDistance = assist > 0.62 ? 2 : 1;
+        for (const endpoint of [pipe.path[0], pipe.path[pipe.path.length - 1]]) {
+          if (path.some(cell => sameCell(cell, endpoint))) continue;
+          const d = Math.abs(endpoint.x - target.x) + Math.abs(endpoint.y - target.y);
+          if (d > 0 && d <= endpointMagnetDistance) {
+            adjustedTarget = endpoint;
+            break;
+          }
+        }
+
+        const route = routeBetween(last, adjustedTarget, pipe.id);
+        if (!route.length) return false;
+
+        ensureMoveTracked();
+
+        let changed = false;
         for (const step of route) {
           if (!validStep(step, pipe.id)) break;
           if (state.settings.allowBreaks) trimOtherPathsAt(step, pipe.id);
           state.playerPaths[pipe.id].push(step);
+          changed = true;
           if (isOwnEndpoint(step, pipe)) break;
         }
-        state.lastPointerCell = target;
-        updateMetrics();
-        drawBoard();
+        return changed;
+      }
+
+      function handlePointerMove(event) {
+        if (!state.drawing || state.activePointerId !== event.pointerId || state.animating) return;
+        event.preventDefault();
+        const pipe = state.level.pipes.find(p => p.id === state.activePipeId);
+        if (!pipe) return;
+
+        const point = pointerPointFromEvent(event);
+        const targets = cellsAlongPointerSegment(state.lastPointerPoint, point);
+        state.lastPointerPoint = point;
+
+        let changed = false;
+        for (const target of targets) {
+          if (processPointerTargetCell(pipe, target)) changed = true;
+          const path = state.playerPaths[pipe.id];
+          if (path.length && isOwnEndpoint(path[path.length - 1], pipe)) break;
+        }
+
+        if (changed) {
+          state.lastPointerCell = targets[targets.length - 1];
+          updateMetrics();
+          drawBoard();
+        }
       }
 
       function handlePointerUp(event) {
@@ -2833,6 +3236,7 @@
         state.activePointerId = null;
         state.moveTrackedThisStroke = false;
         state.lastPointerCell = null;
+        state.lastPointerPoint = null;
         canvas.releasePointerCapture?.(event.pointerId);
         updateMetrics();
         drawBoard();
@@ -2974,6 +3378,7 @@
         if (!$('look-select').value) $('look-select').selectedIndex = 0;
         $('grid-size-select').value = String(state.settings.size);
         $('difficulty-select').value = state.settings.difficulty;
+        populateGeneratorSelect();
         $('generator-select').value = state.settings.generator;
         $('breaks-select').value = String(state.settings.allowBreaks);
         $('input-assist-range').value = String(state.settings.inputAssist ?? 75);
@@ -3028,6 +3433,7 @@
           state.drawing = false;
           state.activePipeId = null;
           state.activePointerId = null;
+          state.lastPointerPoint = null;
         });
 
         $('new-button').addEventListener('click', initGame);
@@ -3040,6 +3446,8 @@
         $('input-assist-range').addEventListener('input', () => {
           $('input-assist-value').textContent = `${$('input-assist-range').value}%`;
         });
+        $('save-custom-profile-button').addEventListener('click', saveCustomProfileFromInput);
+        $('delete-custom-profile-button').addEventListener('click', deleteSelectedCustomProfile);
         $('settings-button').addEventListener('click', openSettings);
         $('close-settings-button').addEventListener('click', closeSettings);
         $('cancel-settings-button').addEventListener('click', closeSettings);
@@ -3062,8 +3470,10 @@
       }
 
       function boot() {
+        loadCustomProfiles();
         loadSettings();
         populateThemeSelects();
+        populateGeneratorSelect();
         setTheme(state.settings.theme);
         bindEvents();
         initGame();
