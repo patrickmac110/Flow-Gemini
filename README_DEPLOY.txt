@@ -1,12 +1,13 @@
-Flow Forge Classic Flow trained build
+Flow Forge edge-aware BFS touch build
 
-Upload all files in this zip to the same GitHub Pages folder.
+Upload all files in this ZIP to the same GitHub Pages folder.
 
-New in this build:
-- Built-in generator: Classic Flow — trained profile
-- Uses Patrick's 21-round hybrid trainer profile
-- Pasted custom profiles now preserve pipeCountAdjustment
-- Custom generation uses at least 10 candidate attempts even if trainer output says candidateCount: 6
+Changes:
+- Restores bounded BFS-style obstacle circumnavigation.
+- BFS activates when direct tracing fails near the user's finger path, especially when the finger rides a cell edge.
+- No live endpoint magnet.
+- Endpoint snap remains conservative and configurable.
+- Flow Free-ish tuned generator remains included.
 
 Files:
 index.html

@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="mobile-web-app-capable" content="yes" />
   <title>Flow Forge</title>
-  <!-- PWA package build: github-pages-fixed-v1 -->
+  <!-- PWA package build: edge-aware-bfs-touch-v1 -->
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
   <link rel="apple-touch-icon" href="icon-192.png" />
@@ -995,7 +995,7 @@
             <option value="fast">Original Forge — restored</option>
             <option value="aesthetic">Aesthetic Forge — scored alternate</option>
           </select>
-          <small>Original Forge uses the restored induced-path merge generator. Aesthetic Forge runs that same no-double-back generator many times, then picks a candidate using difficulty-specific scoring. Classic Flow uses your 21-round trained profile. Custom profiles are pasted from the visualizer trainer.</small>
+          <small>Original Forge uses the restored induced-path merge generator. Aesthetic Forge runs that same no-double-back generator many times, then picks a candidate using difficulty-specific scoring. Classic Flow uses your 21-round trained profile. Flow Free-ish adds continuous perimeter/ring-run scoring. Custom profiles are pasted from the visualizer trainer.</small>
         </div>
         <div class="control">
           <label for="custom-profile-input">Custom Algorithm Profile</label>
@@ -1019,7 +1019,16 @@
             <input id="input-assist-range" type="range" min="0" max="100" step="5" value="75">
             <span class="range-value" id="input-assist-value">75%</span>
           </div>
-          <small>Higher values forgive fast or sloppy swipes with short local detours. It still will not search the whole board.</small>
+          <small>Flow-style input follows the cells your finger actually crosses. Higher values also allow narrow edge-aware routing when your finger rides a grid edge or slides around an obstacle.</small>
+        </div>
+        <div class="control">
+          <label for="snap-style-select">Endpoint Snap</label>
+          <select id="snap-style-select">
+            <option value="flow">Flow Free style — conservative</option>
+            <option value="off">Off — exact drawing only</option>
+            <option value="assist">Assisted — more forgiving</option>
+          </select>
+          <small>Conservative only completes a line when you release genuinely close to the matching endpoint. Path routing is separate and uses narrow edge-aware assist.</small>
         </div>
         <div class="modal-actions">
           <button class="button" id="cancel-settings-button" type="button">Cancel</button>
@@ -1132,7 +1141,8 @@
           difficulty: 'medium',
           generator: 'fast',
           allowBreaks: false,
-          inputAssist: 75
+          inputAssist: 75,
+          snapStyle: 'flow'
         },
         level: null,
         playerPaths: {},
@@ -1185,7 +1195,7 @@
       function normalizeSettings(raw) {
         const defaults = {
           theme: 'theme-plain', paletteName: 'Clear Contrast', look: 'classic', size: 8,
-          difficulty: 'medium', generator: 'fast', allowBreaks: false, inputAssist: 75
+          difficulty: 'medium', generator: 'fast', allowBreaks: false, inputAssist: 75, snapStyle: 'flow'
         };
         const next = Object.assign({}, defaults, raw || {});
         if (!ThemeCatalog[next.theme]) next.theme = defaults.theme;
@@ -1194,9 +1204,10 @@
         if (!theme.looks[next.look]) next.look = Object.keys(theme.looks)[0];
         next.size = clamp(parseInt(next.size, 10) || defaults.size, 5, 12);
         if (!['easy', 'medium', 'hard'].includes(next.difficulty)) next.difficulty = defaults.difficulty;
-        if (!['fast', 'aesthetic', 'classic-trained'].includes(next.generator) && !String(next.generator || '').startsWith('custom:')) next.generator = defaults.generator;
+        if (!['fast', 'aesthetic', 'classic-trained', 'flowfree-tuned'].includes(next.generator) && !String(next.generator || '').startsWith('custom:')) next.generator = defaults.generator;
         next.allowBreaks = next.allowBreaks === true || next.allowBreaks === 'true';
         next.inputAssist = clamp(parseInt(next.inputAssist, 10) || defaults.inputAssist, 0, 100);
+        if (!['off', 'flow', 'assist'].includes(next.snapStyle)) next.snapStyle = defaults.snapStyle;
         return next;
       }
 
@@ -1220,6 +1231,37 @@
       }
 
       const BuiltInCustomProfiles = {
+        'flowfree-tuned': {
+          id: 'flowfree-tuned',
+          name: 'Flow Free-ish — tuned',
+          profileName: 'Flow Free-ish Classic profile',
+          rounds: 21,
+          trainingMethod: '21-round hybrid-trained profile plus extra Flow Free style run metrics',
+          intent: 'Prefer readable official-Flow-like boards: perimeter/ring highways, contour-following lanes, broad segments, frame/wrap structure, and low chaotic center wandering.',
+          pipeCountAdjustment: 0.13,
+          weights: {
+            candidateCount: 18,
+            coverageWeight: 127,
+            endpointWeight: 15.5,
+            turnWeight: 980,
+            balancePenalty: 49,
+            shortPenalty: 22,
+            straightPenalty: 0,
+            perimeterReward: 58,
+            nearPerimeterReward: 18,
+            parallelLaneReward: 124,
+            broadSegmentReward: 118,
+            edgeEndpointReward: 14,
+            frameWrapReward: 132,
+            centerWanderPenalty: 106,
+            wigglePenalty: 128,
+            perimeterRunReward: 115,
+            nearPerimeterRunReward: 54,
+            endpointClusterPenalty: 18,
+            tinyPipePenalty: 46
+          }
+        },
+
         'classic-trained': {
           id: 'classic-trained',
           name: 'Classic Flow — trained',
@@ -1292,6 +1334,7 @@
         if (value === 'aesthetic') return 'Aesthetic Forge';
         if (value === 'fast') return 'Original Forge';
         if (value === 'classic-trained') return 'Classic Flow';
+        if (value === 'flowfree-tuned') return 'Flow Free-ish';
         const profile = customProfileForGenerator(value);
         return profile ? `Custom: ${profile.name}` : 'Custom Profile';
       }
@@ -1303,7 +1346,8 @@
         const base = [
           ['fast', 'Original Forge — restored'],
           ['aesthetic', 'Aesthetic Forge — scored alternate'],
-          ['classic-trained', 'Classic Flow — trained profile']
+          ['classic-trained', 'Classic Flow — trained profile'],
+          ['flowfree-tuned', 'Flow Free-ish — tuned']
         ];
         for (const [value, label] of base) {
           const option = document.createElement('option');
@@ -1906,6 +1950,8 @@
 
           let endpointDistance = 0, turns = 0, segmentsCount = 0, shortMissing = 0, straightExcess = 0, longestRun = 0;
           let perimeterCells = 0, nearPerimeterCells = 0, centerCells = 0, edgeEndpoints = 0, frameWrapUnits = 0, broadSegmentUnits = 0, wiggleUnits = 0;
+          let perimeterRunUnits = 0, nearPerimeterRunUnits = 0, tinyPipeUnits = 0;
+          const endpointCells = [];
           const segments = [];
 
           const ringOf = cell => Math.min(cell.x, cell.y, this.W - 1 - cell.x, this.H - 1 - cell.y);
@@ -1921,6 +1967,8 @@
           sequences.forEach((seq, pipeIndex) => {
             endpointDistance += Math.abs(seq[0].x - seq[seq.length - 1].x) + Math.abs(seq[0].y - seq[seq.length - 1].y);
             if (seq.length < 4) shortMissing += 4 - seq.length;
+            if (seq.length <= 3) tinyPipeUnits += 4 - seq.length;
+            endpointCells.push(seq[0], seq[seq.length - 1]);
             const sides = new Set();
 
             for (const cell of seq) {
@@ -1939,17 +1987,28 @@
 
             let run = 1;
             let prevDir = null;
+            let perimeterRun = 0;
+            let nearPerimeterRun = 0;
             const runs = [];
             for (let i = 1; i < seq.length; i++) {
               const a = seq[i - 1], b = seq[i];
               const dir = { x: b.x - a.x, y: b.y - a.y };
               segments.push({ a, b, dir, pipeIndex });
               const dirKey = `${dir.x},${dir.y}`;
-              if (dirKey === prevDir) run++;
-              else {
+              const onPerimeterSegment = ringOf(a) === 0 && ringOf(b) === 0;
+              const nearPerimeterSegment = ringOf(a) <= 1 && ringOf(b) <= 1;
+              if (dirKey === prevDir) {
+                run++;
+                perimeterRun = onPerimeterSegment ? perimeterRun + 1 : 0;
+                nearPerimeterRun = nearPerimeterSegment ? nearPerimeterRun + 1 : 0;
+              } else {
                 if (prevDir !== null) runs.push(run);
                 run = 1;
+                perimeterRun = onPerimeterSegment ? 1 : 0;
+                nearPerimeterRun = nearPerimeterSegment ? 1 : 0;
               }
+              if (perimeterRun > 2) perimeterRunUnits += perimeterRun - 2;
+              if (nearPerimeterRun > 3) nearPerimeterRunUnits += nearPerimeterRun - 3;
               prevDir = dirKey;
               longestRun = Math.max(longestRun, run);
               if (run > 3) straightExcess++;
@@ -1993,6 +2052,14 @@
             }
           }
 
+          let endpointClusterUnits = 0;
+          for (let i = 0; i < endpointCells.length; i++) {
+            for (let j = i + 1; j < endpointCells.length; j++) {
+              const d = Math.abs(endpointCells[i].x - endpointCells[j].x) + Math.abs(endpointCells[i].y - endpointCells[j].y);
+              if (d > 0 && d <= 2) endpointClusterUnits += 3 - d;
+            }
+          }
+
           const coverage = occupied.size / totalCells;
           const turnRatio = turns / Math.max(1, segmentsCount);
           const perimeterRatio = perimeterCells / totalCells;
@@ -2003,6 +2070,10 @@
           const broadNorm = broadSegmentUnits / Math.max(1, totalCells);
           const frameNorm = frameWrapUnits / Math.max(1, sequences.length * 3);
           const wiggleNorm = wiggleUnits / Math.max(1, segmentsCount);
+          const perimeterRunNorm = perimeterRunUnits / Math.max(1, totalCells);
+          const nearPerimeterRunNorm = nearPerimeterRunUnits / Math.max(1, totalCells);
+          const endpointClusterNorm = endpointClusterUnits / Math.max(1, sequences.length * 2);
+          const tinyPipeNorm = tinyPipeUnits / Math.max(1, sequences.length);
 
           let score = 0;
           score += coverage * (w.coverageWeight ?? 115) * 100;
@@ -2014,11 +2085,15 @@
           score += broadNorm * (w.broadSegmentReward ?? 55) * 100;
           score += edgeEndpointRatio * (w.edgeEndpointReward ?? 32) * 100;
           score += frameNorm * (w.frameWrapReward ?? 75) * 100;
+          score += perimeterRunNorm * (w.perimeterRunReward ?? 0) * 100;
+          score += nearPerimeterRunNorm * (w.nearPerimeterRunReward ?? 0) * 100;
           score -= std * (w.balancePenalty ?? 55);
           score -= shortMissing * (w.shortPenalty ?? 24);
           score -= straightExcess * (w.straightPenalty ?? 4);
           score -= centerRatio * (w.centerWanderPenalty ?? 42) * 100;
           score -= wiggleNorm * (w.wigglePenalty ?? 70) * 100;
+          score -= endpointClusterNorm * (w.endpointClusterPenalty ?? 0) * 100;
+          score -= tinyPipeNorm * (w.tinyPipePenalty ?? 0) * 100;
 
           return score + Math.random() * 20;
         }
@@ -2887,10 +2962,112 @@
         return true;
       }
 
-      function routeBetween(start, target, pipeId) {
-        // Adjustable assist: first follow the traced gesture exactly, then allow a
-        // bounded local correction. The slider changes the correction radius/budget,
-        // not the core rule that the pipe should obey the player's finger.
+      function pointEdgeIntent(point, cell) {
+        if (!point || !state.cellSize) return { active: false, edgeStrength: 0, axis: null };
+        const localX = point.x / state.cellSize - cell.x;
+        const localY = point.y / state.cellSize - cell.y;
+        const edgeX = Math.min(localX, 1 - localX);
+        const edgeY = Math.min(localY, 1 - localY);
+        const edgeDistance = Math.min(edgeX, edgeY);
+        const active = edgeDistance < 0.24;
+        const axis = edgeX < edgeY ? 'vertical-edge' : 'horizontal-edge';
+        return {
+          active,
+          axis,
+          edgeStrength: clamp((0.24 - edgeDistance) / 0.24, 0, 1)
+        };
+      }
+
+      function boundedRouteSearch(start, target, pipeId, options = {}) {
+        const assist = clamp((state.settings.inputAssist ?? 75) / 100, 0, 1);
+        const dx = target.x - start.x;
+        const dy = target.y - start.y;
+        const manhattan = Math.abs(dx) + Math.abs(dy);
+        if (manhattan < 1 || assist <= 0.01) return [];
+
+        const edgeBoost = options.edgeIntent ? options.edgeIntent.edgeStrength : 0;
+        const maxJump = Math.round(3 + assist * 5 + edgeBoost * 3);
+        if (manhattan > maxJump) return [];
+
+        const pad = Math.round(1 + assist * 2 + edgeBoost * 2);
+        const extraBudget = Math.round(2 + assist * 5 + edgeBoost * 4);
+        const maxLen = Math.min(18, manhattan + extraBudget);
+
+        const minX = Math.max(0, Math.min(start.x, target.x) - pad);
+        const maxX = Math.min(state.level.width - 1, Math.max(start.x, target.x) + pad);
+        const minY = Math.max(0, Math.min(start.y, target.y) - pad);
+        const maxY = Math.min(state.level.height - 1, Math.max(start.y, target.y) + pad);
+
+        const key = cell => `${cell.x},${cell.y}`;
+        const inWindow = cell => cell.x >= minX && cell.x <= maxX && cell.y >= minY && cell.y <= maxY;
+        const heuristic = cell => Math.abs(cell.x - target.x) + Math.abs(cell.y - target.y);
+
+        const driftFromGesture = cell => {
+          if (!options.fromPoint || !options.toPoint || !state.cellSize) return 0;
+          const x = (cell.x + 0.5) * state.cellSize;
+          const y = (cell.y + 0.5) * state.cellSize;
+          const ax = options.fromPoint.x, ay = options.fromPoint.y;
+          const bx = options.toPoint.x, by = options.toPoint.y;
+          const vx = bx - ax, vy = by - ay;
+          const len2 = vx * vx + vy * vy;
+          if (len2 < 1) return 0;
+          const t = clamp(((x - ax) * vx + (y - ay) * vy) / len2, 0, 1);
+          const px = ax + vx * t, py = ay + vy * t;
+          return Math.hypot(x - px, y - py) / Math.max(1, state.cellSize);
+        };
+
+        const neighbors = cell => {
+          const raw = [
+            { x: cell.x + 1, y: cell.y },
+            { x: cell.x - 1, y: cell.y },
+            { x: cell.x, y: cell.y + 1 },
+            { x: cell.x, y: cell.y - 1 }
+          ];
+          return raw
+            .filter(n => n.x >= 0 && n.x < state.level.width && n.y >= 0 && n.y < state.level.height)
+            .filter(inWindow)
+            .sort((a, b) => {
+              const da = heuristic(a) + driftFromGesture(a) * (options.edgeIntent?.active ? 0.95 : 1.55);
+              const db = heuristic(b) + driftFromGesture(b) * (options.edgeIntent?.active ? 0.95 : 1.55);
+              return da - db;
+            });
+        };
+
+        const queue = [{ cell: { x: start.x, y: start.y }, route: [] }];
+        const bestSeen = new Map([[key(start), 0]]);
+
+        while (queue.length) {
+          const current = queue.shift();
+          if (current.route.length >= maxLen) continue;
+
+          for (const next of neighbors(current.cell)) {
+            if (!validStep(next, pipeId)) continue;
+            const nextRoute = current.route.concat([{ x: next.x, y: next.y }]);
+            if (sameCell(next, target)) return nextRoute;
+
+            const k = key(next);
+            const old = bestSeen.get(k);
+            if (old !== undefined && old <= nextRoute.length) continue;
+
+            const driftLimit = options.edgeIntent?.active ? pad + 1.15 : pad + 0.35;
+            if (driftFromGesture(next) > driftLimit) continue;
+            if (nextRoute.length + heuristic(next) > maxLen + 1) continue;
+
+            bestSeen.set(k, nextRoute.length);
+            queue.push({ cell: next, route: nextRoute });
+          }
+        }
+
+        return [];
+      }
+
+      function routeBetween(start, target, pipeId, options = {}) {
+        // Hybrid input model:
+        // 1. Follow cells the finger actually crosses.
+        // 2. Bridge skipped cells along direct/simple paths for fast swipes.
+        // 3. If direct routing is blocked and the finger is riding a cell edge,
+        //    allow a narrow bounded BFS around nearby obstacles.
+        // 4. No live endpoint magnet and no whole-board solving.
         if (sameCell(start, target)) return [];
 
         const assist = clamp((state.settings.inputAssist ?? 75) / 100, 0, 1);
@@ -2902,18 +3079,18 @@
         const sy = Math.sign(dy);
         const manhattan = ax + ay;
 
-        const walkAxis = (from, axis, dir) => axis === 'x'
-          ? { x: from.x + dir, y: from.y }
-          : { x: from.x, y: from.y + dir };
+        if (manhattan === 1) return validStep(target, pipeId) ? [target] : [];
 
         const buildRoute = (order) => {
           const route = [];
           let curr = { x: start.x, y: start.y };
           for (const axis of order) {
-            const count = axis === 'x' ? ax : ay;
+            const steps = axis === 'x' ? ax : ay;
             const dir = axis === 'x' ? sx : sy;
-            for (let i = 0; i < count; i++) {
-              curr = walkAxis(curr, axis, dir);
+            for (let i = 0; i < steps; i++) {
+              curr = axis === 'x'
+                ? { x: curr.x + dir, y: curr.y }
+                : { x: curr.x, y: curr.y + dir };
               if (!validStep(curr, pipeId)) return null;
               route.push(curr);
             }
@@ -2921,97 +3098,30 @@
           return sameCell(curr, target) ? route : null;
         };
 
-        const preferredOrders = [];
-        if (dx === 0 || dy === 0) preferredOrders.push(dx === 0 ? ['y'] : ['x']);
-        if (ax >= ay) preferredOrders.push(['x', 'y'], ['y', 'x']);
-        else preferredOrders.push(['y', 'x'], ['x', 'y']);
+        const orders = [];
+        if (ax === 0) orders.push(['y']);
+        else if (ay === 0) orders.push(['x']);
+        else if (ax >= ay) orders.push(['x', 'y'], ['y', 'x']);
+        else orders.push(['y', 'x'], ['x', 'y']);
 
-        if (manhattan === 1) return validStep(target, pipeId) ? [target] : [];
-
-        // Fast straight swipes and simple corner swipes should feel effortless.
-        for (const order of preferredOrders) {
-          const route = buildRoute(order);
-          if (route) return route;
+        const maxDirectBridge = Math.round(2 + assist * 4);
+        if (manhattan <= maxDirectBridge) {
+          for (const order of orders) {
+            const route = buildRoute(order);
+            if (route) return route;
+          }
         }
 
-        // At 0%, the assist is trace-only after direct bridging.
-        if (assist <= 0.01) return [];
-
-        // More forgiving default than the previous balanced pass, but still bounded.
-        // The search window grows slowly with assist strength and target distance.
-        const maxJump = Math.round(5 + assist * 7);          // 5..12 cells
-        if (manhattan > maxJump) return [];
-
-        const pad = Math.round(1 + assist * 3.5);            // 1..5 cells around gesture
-        const extraBudget = Math.round(3 + assist * 7);      // 3..10 detour cells
-        const maxLen = Math.min(22, manhattan + extraBudget);
-        const minX = Math.max(0, Math.min(start.x, target.x) - pad);
-        const maxX = Math.min(state.level.width - 1, Math.max(start.x, target.x) + pad);
-        const minY = Math.max(0, Math.min(start.y, target.y) - pad);
-        const maxY = Math.min(state.level.height - 1, Math.max(start.y, target.y) + pad);
-
-        const key = cell => `${cell.x},${cell.y}`;
-        const inWindow = cell => cell.x >= minX && cell.x <= maxX && cell.y >= minY && cell.y <= maxY;
-        const heuristic = cell => Math.abs(cell.x - target.x) + Math.abs(cell.y - target.y);
-        const driftFromTrace = cell => {
-          // Approximate distance from the bounding line/rectangle between start and target.
-          if (ax === 0) return Math.abs(cell.x - start.x);
-          if (ay === 0) return Math.abs(cell.y - start.y);
-          const vx = dx, vy = dy;
-          const wx = cell.x - start.x, wy = cell.y - start.y;
-          const area = Math.abs(vx * wy - vy * wx);
-          return area / Math.max(1, Math.sqrt(vx * vx + vy * vy));
-        };
-
-        const neighborPriority = cell => {
-          const base = [
-            { x: cell.x + sx, y: cell.y },
-            { x: cell.x, y: cell.y + sy },
-            { x: cell.x + sx, y: cell.y + sy }, // filtered out later as non-adjacent intent anchor only
-            { x: cell.x - sx, y: cell.y },
-            { x: cell.x, y: cell.y - sy },
-            { x: cell.x + 1, y: cell.y },
-            { x: cell.x - 1, y: cell.y },
-            { x: cell.x, y: cell.y + 1 },
-            { x: cell.x, y: cell.y - 1 }
-          ];
-          const seen = new Set();
-          return base.filter(n => {
-            if (Math.abs(n.x - cell.x) + Math.abs(n.y - cell.y) !== 1) return false;
-            const k = key(n);
-            if (seen.has(k)) return false;
-            seen.add(k);
-            return inWindow(n);
-          }).sort((a, b) => (heuristic(a) + driftFromTrace(a) * 0.75) - (heuristic(b) + driftFromTrace(b) * 0.75));
-        };
-
-        const queue = [{ cell: { x: start.x, y: start.y }, route: [] }];
-        const seenBest = new Map([[key(start), 0]]);
-
-        while (queue.length) {
-          const current = queue.shift();
-          if (current.route.length >= maxLen) continue;
-
-          for (const next of neighborPriority(current.cell)) {
-            if (!validStep(next, pipeId)) continue;
-            const nextRoute = current.route.concat([{ x: next.x, y: next.y }]);
-            const nextKey = key(next);
-            if (sameCell(next, target)) return nextRoute;
-
-            const best = seenBest.get(nextKey);
-            if (best !== undefined && best <= nextRoute.length) continue;
-            if (nextRoute.length + heuristic(next) > maxLen + 1) continue;
-            if (driftFromTrace(next) > pad + 0.85) continue;
-
-            seenBest.set(nextKey, nextRoute.length);
-            queue.push({ cell: next, route: nextRoute });
-          }
+        const edgeIntent = options.edgeIntent || pointEdgeIntent(options.toPoint, target);
+        const shouldSearch = edgeIntent.active || manhattan <= Math.round(2 + assist * 3);
+        if (shouldSearch) {
+          return boundedRouteSearch(start, target, pipeId, { ...options, edgeIntent });
         }
 
         return [];
       }
 
-      function cellFromEvent(event) {
+            function cellFromEvent(event) {
         const rect = canvas.getBoundingClientRect();
         const x = clamp(Math.floor((event.clientX - rect.left) / state.cellSize), 0, state.level.width - 1);
         const y = clamp(Math.floor((event.clientY - rect.top) / state.cellSize), 0, state.level.height - 1);
@@ -3034,26 +3144,32 @@
       }
 
       function cellsAlongPointerSegment(from, to) {
-        if (!from || !to || !state.cellSize) return [cellFromPoint(to)];
+        if (!from || !to || !state.cellSize) {
+          const cell = cellFromPoint(to);
+          return [{ cell, point: to, edgeIntent: pointEdgeIntent(to, cell) }];
+        }
         const dx = to.x - from.x;
         const dy = to.y - from.y;
         const distance = Math.hypot(dx, dy);
-        const sampleCount = Math.max(1, Math.ceil(distance / Math.max(4, state.cellSize * 0.28)));
-        const cells = [];
+        const sampleCount = Math.max(1, Math.ceil(distance / Math.max(3, state.cellSize * 0.18)));
+        const samples = [];
         let lastKey = null;
         for (let i = 1; i <= sampleCount; i++) {
           const t = i / sampleCount;
-          const cell = cellFromPoint({ x: from.x + dx * t, y: from.y + dy * t });
+          const point = { x: from.x + dx * t, y: from.y + dy * t };
+          const cell = cellFromPoint(point);
           const key = keyOf(cell);
           if (key !== lastKey) {
-            cells.push(cell);
+            samples.push({ cell, point, edgeIntent: pointEdgeIntent(point, cell) });
             lastKey = key;
+          } else if (samples.length) {
+            samples[samples.length - 1] = { cell, point, edgeIntent: pointEdgeIntent(point, cell) };
           }
         }
-        return cells;
+        return samples;
       }
 
-      function trimOtherPathsAt(cell, pipeId) {
+            function trimOtherPathsAt(cell, pipeId) {
         for (const pipe of state.level.pipes) {
           if (pipe.id === pipeId) continue;
           const path = state.playerPaths[pipe.id] || [];
@@ -3067,10 +3183,13 @@
       }
 
       function trySnapToOwnEndpoint(pipe) {
-        // When the player releases just shy of the matching endpoint, finish the
-        // obvious connection. This keeps small touch misses from feeling punitive,
-        // while still requiring the endpoint to be genuinely nearby.
-        if (!pipe || !state.level) return false;
+        // Conservative release snap. Flow Free does not feel like it is steering
+        // the pipe mid-drag; it mostly forgives tiny release misses. So snapping is
+        // now:
+        //   off: never
+        //   flow: only one grid cell away and physically near the endpoint center
+        //   assist: up to two grid cells, still requiring a direct legal route
+        if (!pipe || !state.level || state.settings.snapStyle === 'off') return false;
         const path = state.playerPaths[pipe.id] || [];
         if (!path.length) return false;
 
@@ -3078,24 +3197,39 @@
         if (isOwnEndpoint(last, pipe)) return false;
 
         const assist = clamp((state.settings.inputAssist ?? 75) / 100, 0, 1);
-        const snapMaxDistance = assist > 0.82 ? 3 : 2;
+        const snapStyle = state.settings.snapStyle || 'flow';
+        const maxGridDistance = snapStyle === 'assist' ? (assist > 0.85 ? 2 : 1) : 1;
+        const releasePoint = state.lastPointerPoint;
         const endpoints = [pipe.path[0], pipe.path[pipe.path.length - 1]];
+
         const candidates = endpoints
           .filter(endpoint => !path.some(cell => sameCell(cell, endpoint)))
-          .map(endpoint => ({
-            endpoint,
-            distance: Math.abs(endpoint.x - last.x) + Math.abs(endpoint.y - last.y)
-          }))
-          .filter(item => item.distance >= 1 && item.distance <= snapMaxDistance)
-          .sort((a, b) => a.distance - b.distance);
+          .map(endpoint => {
+            const center = {
+              x: (endpoint.x + 0.5) * state.cellSize,
+              y: (endpoint.y + 0.5) * state.cellSize
+            };
+            const pixelDistance = releasePoint
+              ? Math.hypot(releasePoint.x - center.x, releasePoint.y - center.y) / Math.max(1, state.cellSize)
+              : Infinity;
+            return {
+              endpoint,
+              gridDistance: Math.abs(endpoint.x - last.x) + Math.abs(endpoint.y - last.y),
+              pixelDistance
+            };
+          })
+          .filter(item => {
+            if (item.gridDistance < 1 || item.gridDistance > maxGridDistance) return false;
+            if (snapStyle === 'flow') return item.pixelDistance <= 0.72;
+            return item.pixelDistance <= 1.15;
+          })
+          .sort((a, b) => (a.gridDistance + a.pixelDistance) - (b.gridDistance + b.pixelDistance));
 
         for (const candidate of candidates) {
-          const route = routeBetween(last, candidate.endpoint, pipe.id);
+          const route = routeBetween(last, candidate.endpoint, pipe.id, { toPoint: releasePoint, edgeIntent: { active: false, edgeStrength: 0 } });
           if (!route.length || !sameCell(route[route.length - 1], candidate.endpoint)) continue;
-
-          // Snapping should feel like a magnetic endpoint, not a hidden mini-solver.
-          // One extra correction cell is allowed for touch slop; longer routes are ignored.
-          if (route.length > candidate.distance + Math.round(1 + assist * 2)) continue;
+          if (snapStyle === 'flow' && route.length > 1) continue;
+          if (snapStyle === 'assist' && route.length > candidate.gridDistance + 1) continue;
 
           const beforeSnap = state.playerPaths[pipe.id].map(cell => ({ x: cell.x, y: cell.y }));
           for (const step of route) {
@@ -3149,7 +3283,7 @@
         }
       }
 
-      function processPointerTargetCell(pipe, target) {
+      function processPointerTargetCell(pipe, target, options = {}) {
         const path = state.playerPaths[pipe.id];
         const last = path[path.length - 1];
         if (!last || sameCell(last, target)) return false;
@@ -3163,21 +3297,7 @@
 
         if (path.length > 1 && isOwnEndpoint(last, pipe)) return false;
 
-        // Endpoint magnet while drawing: when the pointer gets very close to the
-        // matching endpoint, aim for the endpoint instead of the slightly-missed cell.
-        const assist = clamp((state.settings.inputAssist ?? 75) / 100, 0, 1);
-        let adjustedTarget = target;
-        const endpointMagnetDistance = assist > 0.62 ? 2 : 1;
-        for (const endpoint of [pipe.path[0], pipe.path[pipe.path.length - 1]]) {
-          if (path.some(cell => sameCell(cell, endpoint))) continue;
-          const d = Math.abs(endpoint.x - target.x) + Math.abs(endpoint.y - target.y);
-          if (d > 0 && d <= endpointMagnetDistance) {
-            adjustedTarget = endpoint;
-            break;
-          }
-        }
-
-        const route = routeBetween(last, adjustedTarget, pipe.id);
+        const route = routeBetween(last, target, pipe.id, options);
         if (!route.length) return false;
 
         ensureMoveTracked();
@@ -3200,18 +3320,23 @@
         if (!pipe) return;
 
         const point = pointerPointFromEvent(event);
-        const targets = cellsAlongPointerSegment(state.lastPointerPoint, point);
+        const fromPoint = state.lastPointerPoint;
+        const samples = cellsAlongPointerSegment(fromPoint, point);
         state.lastPointerPoint = point;
 
         let changed = false;
-        for (const target of targets) {
-          if (processPointerTargetCell(pipe, target)) changed = true;
+        for (const sample of samples) {
+          if (processPointerTargetCell(pipe, sample.cell, {
+            fromPoint,
+            toPoint: sample.point,
+            edgeIntent: sample.edgeIntent
+          })) changed = true;
           const path = state.playerPaths[pipe.id];
           if (path.length && isOwnEndpoint(path[path.length - 1], pipe)) break;
         }
 
         if (changed) {
-          state.lastPointerCell = targets[targets.length - 1];
+          state.lastPointerCell = samples[samples.length - 1]?.cell || null;
           updateMetrics();
           drawBoard();
         }
@@ -3383,6 +3508,7 @@
         $('breaks-select').value = String(state.settings.allowBreaks);
         $('input-assist-range').value = String(state.settings.inputAssist ?? 75);
         $('input-assist-value').textContent = `${state.settings.inputAssist ?? 75}%`;
+        $('snap-style-select').value = state.settings.snapStyle || 'flow';
       }
 
       function openSettings() {
@@ -3403,7 +3529,8 @@
           difficulty: $('difficulty-select').value,
           generator: $('generator-select').value,
           allowBreaks: $('breaks-select').value === 'true',
-          inputAssist: parseInt($('input-assist-range').value, 10)
+          inputAssist: parseInt($('input-assist-range').value, 10),
+          snapStyle: $('snap-style-select').value
         };
         const needsNewLevel = next.size !== state.settings.size || next.difficulty !== state.settings.difficulty || next.generator !== state.settings.generator || next.paletteName !== state.settings.paletteName;
         const themeChanged = next.theme !== state.settings.theme;
